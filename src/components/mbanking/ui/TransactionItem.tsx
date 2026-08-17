@@ -13,7 +13,7 @@ interface TransactionItemProps {
 }
 
 const TONE_CLASS: Record<string, string> = {
-  indigo: "bg-indigo-50 text-indigo-700 border border-indigo-100",
+  indigo: "bg-emerald-50 text-emerald-700 border border-emerald-100",
   slate: "bg-slate-900 text-white border border-slate-800",
   amber: "bg-amber-50 text-amber-700 border border-amber-100",
   emerald: "bg-emerald-50 text-emerald-700 border border-emerald-100",

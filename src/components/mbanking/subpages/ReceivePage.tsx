@@ -39,7 +39,7 @@ export function ReceivePage() {
         <h3 className="mb-1 text-2xl font-black tracking-tight text-slate-900">
           {companyName}
         </h3>
-        <p className="mb-8 rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold uppercase tracking-widest text-indigo-600">
+        <p className="mb-8 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold uppercase tracking-widest text-emerald-700">
           {primary?.label ?? "EUR Main Treasury"}
         </p>
 
@@ -55,7 +55,7 @@ export function ReceivePage() {
           Funds typically settle same business day for SEPA, 1–3 days for SWIFT.
         </p>
         <p className="mt-3 text-center text-[10px] font-bold uppercase tracking-widest text-slate-300">
-          Routed via {BANK.shortName} · DMCC-3184
+          Routed via {BANK.shortName} · {BANK.license}
         </p>
       </div>
     </SubPage>

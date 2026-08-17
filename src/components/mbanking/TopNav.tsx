@@ -29,7 +29,7 @@ export function TopNav() {
               className={cn(
                 "active-scale flex flex-1 flex-col items-center justify-center gap-1 rounded-xl py-2.5 text-[10px] font-bold transition-all",
                 active
-                  ? "border border-slate-100 bg-white text-indigo-700 shadow-sm"
+                  ? "border border-emerald-100 bg-white text-emerald-800 shadow-sm"
                   : "text-slate-500 hover:text-slate-900"
               )}
             >

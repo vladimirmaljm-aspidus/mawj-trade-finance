@@ -14,24 +14,26 @@ export function Header() {
 
   return (
     <header className="relative z-30 flex flex-col bg-gradient-to-b from-[#f8fafc] to-transparent">
+      {/* UAE flag accent strip — very top */}
+      <div className="uae-flag-accent absolute left-0 right-0 top-0 h-1" />
       {/* Bank brand bar */}
-      <div className="flex items-center justify-between px-5 pt-11 pb-1">
+      <div className="flex items-center justify-between px-5 pt-12 pb-1">
         <div className="flex items-center gap-2.5">
           <img
             src="/icons/icon-192.png"
             alt={BANK.name}
-            className="h-7 w-7 rounded-md shadow-sm"
+            className="h-8 w-8 rounded-md shadow-sm ring-1 ring-slate-200"
           />
           <div className="flex flex-col leading-none">
             <span className="text-[15px] font-black tracking-tight text-slate-900">
               {BANK.shortName}
             </span>
-            <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-amber-700">
-              Trade Finance Bank
+            <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-emerald-800">
+              {BANK.tagline}
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-emerald-600">
+        <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-emerald-700">
           <ShieldCheck className="h-3 w-3" />
           <span className="hidden xs:inline">Secured</span>
         </div>
@@ -41,7 +43,7 @@ export function Header() {
       <div className="flex items-center justify-between px-6 pb-3 pt-3">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <div className="flex h-12 w-12 items-center justify-center rounded-[1rem] border border-indigo-800 bg-gradient-to-br from-indigo-900 to-slate-900 text-xl font-black text-white shadow-lg">
+            <div className="flex h-12 w-12 items-center justify-center rounded-[1rem] border border-emerald-800 bg-gradient-to-br from-emerald-900 to-slate-900 text-xl font-black text-white shadow-lg">
               {holder
                 .split(" ")
                 .map((n) => n[0])

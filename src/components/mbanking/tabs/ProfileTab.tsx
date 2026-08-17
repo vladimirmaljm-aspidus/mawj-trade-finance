@@ -50,7 +50,7 @@ export function ProfileTab() {
       {/* Account summary */}
       <div className="rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-indigo-900 to-slate-900 text-sm font-black text-amber-400">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-emerald-900 to-slate-900 text-sm font-black text-amber-400">
             {(profile?.full_name || "VM")
               .split(" ")
               .map((n) => n[0])
@@ -144,7 +144,7 @@ export function ProfileTab() {
 }
 
 const TONE = {
-  indigo: "bg-indigo-50 text-indigo-600",
+  indigo: "bg-emerald-50 text-emerald-700",
   blue: "bg-blue-50 text-blue-600",
   emerald: "bg-emerald-50 text-emerald-600",
   amber: "bg-amber-50 text-amber-600",

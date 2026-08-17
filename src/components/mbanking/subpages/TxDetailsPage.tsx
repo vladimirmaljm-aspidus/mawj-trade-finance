@@ -9,7 +9,7 @@ import { toast } from "@/lib/mbanking/toast";
 import { cn } from "@/lib/utils";
 
 const TONE_CLASS: Record<string, string> = {
-  indigo: "bg-indigo-50 text-indigo-700 border border-indigo-100",
+  indigo: "bg-emerald-50 text-emerald-700 border border-emerald-100",
   slate: "bg-slate-900 text-white border border-slate-800",
   amber: "bg-amber-50 text-amber-700 border border-amber-100",
   emerald: "bg-emerald-50 text-emerald-700 border border-emerald-100",
@@ -47,16 +47,25 @@ export function TxDetailsPage() {
     const W = doc.internal.pageSize.getWidth();
     let y = 60;
 
-    doc.setFillColor(10, 22, 40);
+    doc.setFillColor(11, 61, 46);
     doc.rect(0, 0, W, 110, "F");
     doc.setTextColor(201, 161, 74);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(20);
-    doc.text("MAWJ TRADE FINANCE BANK", 40, 50);
+    doc.text("COMMERCIAL BANK INTERNATIONAL", 40, 50);
     doc.setTextColor(200, 200, 200);
     doc.setFontSize(9);
-    doc.text("CORPORATE TREASURY · OFFICIAL RECEIPT", 40, 70);
-    doc.text("DMCC-3184 · Dubai, UAE", 40, 84);
+    doc.text("CORPORATE BANKING · OFFICIAL RECEIPT", 40, 70);
+    doc.text("CBI-UAE-1976 · United Arab Emirates", 40, 84);
+    // UAE flag accent strip
+    doc.setFillColor(200, 16, 46);
+    doc.rect(40, 92, W - 80, 3, "F");
+    doc.setFillColor(0, 122, 61);
+    doc.rect(40, 95, W - 80, 3, "F");
+    doc.setFillColor(255, 255, 255);
+    doc.rect(40, 98, W - 80, 3, "F");
+    doc.setFillColor(0, 0, 0);
+    doc.rect(40, 101, W - 80, 3, "F");
 
     y = 150;
     doc.setTextColor(30, 30, 30);
@@ -96,7 +105,7 @@ export function TxDetailsPage() {
       ["Method", tx.method],
       ["Reference", tx.reference],
       ["Account Holder", profile?.company_name || "Aspidus DMCC"],
-      ["Account Used", `MAWJ (••${accountMask})`],
+      ["Account Used", `CBI (••${accountMask})`],
     ];
 
     doc.setDrawColor(230, 230, 230);
@@ -119,10 +128,10 @@ export function TxDetailsPage() {
     doc.setTextColor(150, 150, 150);
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
-    doc.text("System-generated receipt from Mawj Trade Finance Bank DMCC.", 40, H - 45);
+    doc.text("System-generated receipt from Commercial Bank International PJSC.", 40, H - 45);
     doc.text(`Generated ${new Date().toLocaleString("en-GB")}`, 40, H - 32);
 
-    doc.save(`Mawj-Receipt-${tx.reference}.pdf`);
+    doc.save(`CBI-Receipt-${tx.reference}.pdf`);
     toast("Official PDF Receipt downloaded.", "success");
   };
 
@@ -190,7 +199,7 @@ export function TxDetailsPage() {
           </DetailRow>
           <DetailRow label="Account Used" last>
             <span className="text-sm font-black text-slate-900">
-              MAWJ (••{accountMask})
+              CBI (••{accountMask})
             </span>
           </DetailRow>
         </div>

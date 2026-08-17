@@ -115,20 +115,22 @@ export function BiometricLogin({ onAuthenticated }: Props) {
   return (
     <div
       className="premium-navy-card fixed inset-0 z-[200] flex flex-col items-center justify-center px-8 text-center text-white"
-      style={{ backgroundColor: "#0a1628" }}
+      style={{ backgroundColor: "#0B3D2E" }}
     >
+      {/* UAE flag accent strip — top */}
+      <div className="uae-flag-accent absolute left-0 right-0 top-0 h-1 opacity-90" />
       <div className="relative z-10 flex w-full max-w-sm flex-col items-center">
         {/* Logo */}
-        <div className="mb-3 flex h-20 w-20 items-center justify-center rounded-[1.25rem] border border-amber-500/20 bg-white/[0.03] shadow-2xl">
-          <img src="/icons/icon-192.png" alt="Mawj" className="h-20 w-20 rounded-[1.25rem]" />
+        <div className="mb-3 flex h-20 w-20 items-center justify-center overflow-hidden rounded-[1.25rem] shadow-2xl ring-1 ring-white/10">
+          <img src="/icons/icon-192.png" alt={BANK.name} className="h-20 w-20 rounded-[1.25rem]" />
         </div>
         <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-amber-400/80">
           {BANK.tagline}
         </p>
         <h1 className="mt-2 text-2xl font-black tracking-tight">{BANK.name}</h1>
-        <p className="mt-2 max-w-xs text-xs font-medium text-slate-400">
-          Authorized signatory access. Verify your identity with biometrics to
-          open the corporate treasury.
+        <p className="mt-2 max-w-xs text-xs font-medium text-slate-300/80">
+          Authorized signatory access. Verify your identity to open the
+          corporate treasury.
         </p>
 
         {/* Biometric button */}

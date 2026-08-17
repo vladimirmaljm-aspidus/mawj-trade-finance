@@ -14,11 +14,11 @@ export function CompanyDetailsPage() {
           <img
             src="/icons/icon-192.png"
             alt={BANK.name}
-            className="mb-3 h-16 w-16 rounded-2xl shadow-sm"
+            className="mb-3 h-16 w-16 rounded-2xl shadow-sm ring-1 ring-slate-200"
           />
           <h2 className="text-lg font-black text-slate-900">{BANK.legalName}</h2>
-          <p className="mt-1 text-xs font-bold uppercase tracking-widest text-amber-700">
-            DMCC-Regulated Trade Finance Institution
+          <p className="mt-1 text-xs font-bold uppercase tracking-widest text-emerald-800">
+            UAE-Licensed Corporate Bank
           </p>
         </div>
 

@@ -123,7 +123,7 @@ function SplashScreen() {
   return (
     <div
       className="premium-navy-card fixed inset-0 z-[200] flex flex-col items-center justify-center text-white"
-      style={{ backgroundColor: "#0a1628" }}
+      style={{ backgroundColor: "#0B3D2E" }}
     >
       <div className="relative z-10 flex flex-col items-center">
         <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-[1rem] border border-amber-500/20 bg-white/[0.03]">

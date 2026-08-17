@@ -114,14 +114,14 @@ export function FxTab() {
       {/* Converter */}
       <div className="relative rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-sm">
         {/* Sell */}
-        <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4 transition-colors focus-within:border-indigo-300">
+        <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4 transition-colors focus-within:border-emerald-300">
           <div className="mb-3 flex justify-between">
             <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
               You Sell
             </span>
             <button
               onClick={() => setAmount(String(numericAmount))}
-              className="text-[10px] font-black uppercase text-indigo-600"
+              className="text-[10px] font-black uppercase text-emerald-700"
             >
               Max
             </button>
@@ -149,7 +149,7 @@ export function FxTab() {
         {/* Swap */}
         <button
           onClick={swap}
-          className="active-scale absolute left-1/2 top-1/2 z-10 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-4 border-white bg-indigo-600 text-white shadow-lg transition-transform duration-500 hover:rotate-180"
+          className="active-scale absolute left-1/2 top-1/2 z-10 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-4 border-white bg-emerald-700 text-white shadow-lg transition-transform duration-500 hover:rotate-180"
           aria-label="Swap currencies"
         >
           <ArrowDownUp className="h-5 w-5 stroke-[2.5]" />
@@ -264,7 +264,7 @@ function CurrencyPicker({
               className={cn(
                 "flex items-center justify-between rounded-xl p-4 text-left transition-colors",
                 code === current
-                  ? "bg-indigo-50"
+                  ? "bg-emerald-50"
                   : "hover:bg-slate-50"
               )}
             >
@@ -278,7 +278,7 @@ function CurrencyPicker({
                 </div>
               </div>
               {code === current && (
-                <span className="text-xs font-black text-indigo-600">SELECTED</span>
+                <span className="text-xs font-black text-emerald-700">SELECTED</span>
               )}
             </button>
           ))}

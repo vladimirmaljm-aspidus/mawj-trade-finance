@@ -77,7 +77,7 @@ export function PaymentsTab() {
             setSuccess(false);
             setTab("home");
           }}
-          className="active-scale mt-6 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-black text-white shadow-md hover:bg-indigo-700"
+          className="active-scale mt-6 rounded-xl bg-emerald-700 px-6 py-3 text-sm font-black text-white shadow-md hover:bg-emerald-800"
         >
           Done
         </button>
@@ -129,7 +129,7 @@ export function PaymentsTab() {
                 className={cn(
                   "flex h-[3.5rem] w-[3.5rem] items-center justify-center rounded-[1.2rem] text-lg font-black shadow-sm",
                   c.tone === "indigo" &&
-                    "border border-indigo-100 bg-indigo-50 text-indigo-600",
+                    "border border-emerald-100 bg-emerald-50 text-emerald-700",
                   c.tone === "slate" &&
                     "border border-slate-800 bg-slate-900 text-white",
                   c.tone === "amber" &&
@@ -183,7 +183,7 @@ export function PaymentsTab() {
             onChange={(e) => setRecipient(e.target.value)}
             required
             placeholder="Enter company name"
-            className="w-full rounded-[1rem] border border-slate-200 bg-slate-50 p-3.5 text-sm font-bold text-slate-900 outline-none transition-all placeholder:font-medium placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:ring-1 focus:ring-indigo-500"
+            className="w-full rounded-[1rem] border border-slate-200 bg-slate-50 p-3.5 text-sm font-bold text-slate-900 outline-none transition-all placeholder:font-medium placeholder:text-slate-400 focus:border-emerald-600 focus:bg-white focus:ring-1 focus:ring-emerald-600"
           />
         </div>
 
@@ -197,7 +197,7 @@ export function PaymentsTab() {
             onChange={(e) => setIban(e.target.value.toUpperCase())}
             required
             placeholder="AE89 0330 0044 0532 01"
-            className="w-full rounded-[1rem] border border-slate-200 bg-slate-50 p-3.5 font-mono text-sm font-bold uppercase text-slate-900 outline-none transition-all placeholder:font-medium placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:ring-1 focus:ring-indigo-500"
+            className="w-full rounded-[1rem] border border-slate-200 bg-slate-50 p-3.5 font-mono text-sm font-bold uppercase text-slate-900 outline-none transition-all placeholder:font-medium placeholder:text-slate-400 focus:border-emerald-600 focus:bg-white focus:ring-1 focus:ring-emerald-600"
           />
         </div>
 
@@ -216,12 +216,12 @@ export function PaymentsTab() {
               min="1"
               step="0.01"
               placeholder="0.00"
-              className="w-full rounded-[1rem] border border-slate-200 bg-slate-50 py-4 pl-10 pr-4 text-2xl font-black text-slate-900 outline-none transition-all placeholder:text-slate-300 focus:border-indigo-500 focus:bg-white focus:ring-1 focus:ring-indigo-500"
+              className="w-full rounded-[1rem] border border-slate-200 bg-slate-50 py-4 pl-10 pr-4 text-2xl font-black text-slate-900 outline-none transition-all placeholder:text-slate-300 focus:border-emerald-600 focus:bg-white focus:ring-1 focus:ring-emerald-600"
             />
           </div>
         </div>
 
-        <div className="flex items-center justify-between rounded-xl border border-indigo-100/50 bg-indigo-50/50 p-3">
+        <div className="flex items-center justify-between rounded-xl border border-emerald-100/50 bg-emerald-50/50 p-3">
           <span className="text-xs font-bold text-slate-500">Transfer Fee</span>
           <span className="rounded bg-emerald-100 px-2 py-0.5 text-xs font-black text-emerald-600">
             FREE (VIP)
@@ -231,7 +231,7 @@ export function PaymentsTab() {
         <button
           type="submit"
           disabled={submitting}
-          className="active-scale mt-2 flex w-full items-center justify-center gap-2 rounded-[1rem] bg-indigo-600 py-4 text-sm font-black text-white shadow-md shadow-indigo-600/20 transition-all hover:bg-indigo-700 disabled:opacity-70"
+          className="active-scale mt-2 flex w-full items-center justify-center gap-2 rounded-[1rem] bg-emerald-700 py-4 text-sm font-black text-white shadow-md shadow-emerald-700/20 transition-all hover:bg-emerald-800 disabled:opacity-70"
         >
           <ShieldCheck className="h-4 w-4 stroke-[2.5]" />
           {submitting ? "Authorizing…" : "Authorize Transfer"}

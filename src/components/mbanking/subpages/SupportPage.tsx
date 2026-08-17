@@ -15,11 +15,11 @@ export function SupportPage() {
   return (
     <SubPage title="Relationship Manager">
       <div className="flex flex-col items-center p-5 pt-10">
-        <div className="mb-5 flex h-28 w-28 items-center justify-center rounded-full border-4 border-white bg-gradient-to-br from-indigo-100 to-slate-200 text-3xl font-black text-indigo-700 shadow-xl">
+        <div className="mb-5 flex h-28 w-28 items-center justify-center rounded-full border-4 border-white bg-gradient-to-br from-emerald-100 to-slate-200 text-3xl font-black text-emerald-700 shadow-xl">
           {ADVISOR.initials}
         </div>
         <h2 className="text-2xl font-black text-slate-900">{ADVISOR.name}</h2>
-        <p className="mb-8 rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold uppercase tracking-widest text-indigo-600">
+        <p className="mb-8 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold uppercase tracking-widest text-emerald-700">
           {ADVISOR.role}
         </p>
 

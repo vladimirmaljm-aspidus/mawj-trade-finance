@@ -122,7 +122,7 @@ export function CardsTab() {
         {/* Freeze physical */}
         <div className="flex items-center justify-between border-b border-slate-100 p-5">
           <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
               <Lock className="h-4 w-4 stroke-[2.5]" />
             </div>
             <div>
@@ -231,7 +231,7 @@ function ToggleSwitch({
       onClick={onChange}
       className={cn(
         "active-scale relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full transition-colors",
-        checked ? "bg-indigo-600" : "bg-slate-200"
+        checked ? "bg-emerald-700" : "bg-slate-200"
       )}
     >
       <span

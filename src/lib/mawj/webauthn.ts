@@ -44,7 +44,7 @@ function randomChallenge(): string {
   return randomBytes(32).toString("base64url");
 }
 
-const RP_NAME = "Mawj Trade Finance Bank DMCC";
+const RP_NAME = "Commercial Bank International";
 
 /** Store a challenge in auth_challenges and return the challenge string. */
 async function persistChallenge(purpose: "register" | "auth"): Promise<string> {

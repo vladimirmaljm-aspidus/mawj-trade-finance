@@ -190,10 +190,10 @@ export const useMbanking = create<MbankingState>((set, get) => ({
 
 /** Bank branding constants (client-side). */
 export const BANK = {
-  name: "Mawj Trade Finance Bank",
-  shortName: "Mawj",
-  legalName: "Mawj Trade Finance Bank DMCC",
-  tagline: "Trade Finance · Treasury · Custody",
-  license: "DMCC-3184",
-  regulatedBy: "Regulated by the UAE Central Bank",
+  name: "Commercial Bank International",
+  shortName: "CBI",
+  legalName: "Commercial Bank International PJSC",
+  tagline: "Corporate Banking · Trade Finance",
+  license: "CBI-UAE-1976",
+  regulatedBy: "Regulated by the Central Bank of the UAE",
 };

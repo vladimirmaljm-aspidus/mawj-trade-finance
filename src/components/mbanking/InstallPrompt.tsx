@@ -76,11 +76,9 @@ export function InstallPrompt() {
     return (
       <div className="aspidus-slide-up fixed inset-x-3 bottom-3 z-[90] mx-auto max-w-md rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-900 to-slate-900 text-lg font-black text-amber-400">
-            A
-          </div>
+          <img src="/icons/icon-192.png" alt="CBI" className="h-11 w-11 shrink-0 rounded-xl shadow-sm ring-1 ring-slate-200" />
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-black text-slate-900">Install Aspidus</p>
+            <p className="text-sm font-black text-slate-900">Install CBI</p>
             <p className="truncate text-xs font-medium text-slate-500">
               Add to your home screen for a native app experience.
             </p>
@@ -95,7 +93,7 @@ export function InstallPrompt() {
         </div>
         <button
           onClick={install}
-          className="active-scale mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 py-3 text-sm font-black text-white shadow-md transition-colors hover:bg-indigo-700"
+          className="active-scale mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 py-3 text-sm font-black text-white shadow-md transition-colors hover:bg-emerald-800"
         >
           <Download className="h-4 w-4" />
           Install App
@@ -123,11 +121,9 @@ export function InstallPrompt() {
     return (
       <div className="aspidus-slide-up fixed inset-x-3 bottom-3 z-[90] mx-auto max-w-md rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl">
         <div className="flex items-start gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-900 to-slate-900 text-lg font-black text-amber-400">
-            A
-          </div>
+          <img src="/icons/icon-192.png" alt="CBI" className="h-11 w-11 shrink-0 rounded-xl shadow-sm ring-1 ring-slate-200" />
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-black text-slate-900">Install Aspidus</p>
+            <p className="text-sm font-black text-slate-900">Install CBI</p>
             <p className="text-xs font-medium text-slate-500">
               Tap{" "}
               <span className="font-black text-slate-900">

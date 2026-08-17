@@ -4,16 +4,16 @@ export const dynamic = "force-static";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Mawj Trade Finance Bank DMCC",
-    short_name: "Mawj",
+    name: "Commercial Bank International — Corporate Treasury",
+    short_name: "CBI",
     description:
-      "Corporate treasury & trade finance for authorized signatories. Manage liquidity, letters of credit, FX and cross-border payments.",
+      "Corporate banking & trade finance for authorized signatories. Manage liquidity, letters of credit, FX and cross-border payments.",
     start_url: "/",
     scope: "/",
     display: "standalone",
     orientation: "portrait",
-    background_color: "#0a1628",
-    theme_color: "#0a1628",
+    background_color: "#0B3D2E",
+    theme_color: "#0B3D2E",
     categories: ["finance", "business", "productivity"],
     lang: "en",
     dir: "ltr",

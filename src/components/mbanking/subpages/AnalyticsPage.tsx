@@ -92,7 +92,7 @@ export function AnalyticsPage() {
                   </div>
                   <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
                     <div
-                      className="h-full rounded-full bg-indigo-500"
+                      className="h-full rounded-full bg-emerald-600"
                       style={{ width: `${Math.max(4, (amt / maxCat) * 100)}%` }}
                     />
                   </div>

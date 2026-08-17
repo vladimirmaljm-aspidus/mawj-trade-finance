@@ -11,26 +11,27 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Mawj Trade Finance Bank — Corporate Treasury",
+  title: "Commercial Bank International — Corporate Treasury",
   description:
-    "Corporate treasury & trade finance for authorized signatories. Liquidity, letters of credit, FX and cross-border payments.",
+    "Corporate banking & trade finance for authorized signatories. Liquidity, letters of credit, FX and cross-border payments.",
   keywords: [
-    "Mawj",
+    "Commercial Bank International",
+    "CBI",
     "trade finance",
     "corporate treasury",
     "letter of credit",
     "SEPA",
     "SWIFT",
+    "UAE",
     "Dubai",
-    "DMCC",
   ],
-  authors: [{ name: "Mawj Trade Finance Bank DMCC" }],
-  applicationName: "Mawj",
+  authors: [{ name: "Commercial Bank International PJSC" }],
+  applicationName: "CBI",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Mawj",
+    title: "CBI",
   },
   formatDetection: { telephone: false, email: false, address: false },
   icons: {
@@ -44,7 +45,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0a1628",
+  themeColor: "#0B3D2E",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -64,7 +65,7 @@ export default function RootLayout({
           name="apple-mobile-web-app-status-bar-style"
           content="black-translucent"
         />
-        <meta name="apple-mobile-web-app-title" content="Mawj" />
+        <meta name="apple-mobile-web-app-title" content="CBI" />
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
       </head>
       <body className={`${inter.variable} antialiased bg-background text-foreground`}>

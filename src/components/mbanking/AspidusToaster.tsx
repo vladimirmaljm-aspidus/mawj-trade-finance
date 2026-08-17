@@ -4,7 +4,7 @@ import { useToastStore } from "@/lib/mbanking/toast";
 import { Info, CheckCircle2, AlertCircle } from "lucide-react";
 
 const TONE_STYLES = {
-  info: { icon: Info, iconColor: "text-indigo-400" },
+  info: { icon: Info, iconColor: "text-emerald-400" },
   success: { icon: CheckCircle2, iconColor: "text-emerald-400" },
   error: { icon: AlertCircle, iconColor: "text-rose-400" },
 } as const;

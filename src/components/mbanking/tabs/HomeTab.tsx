@@ -35,6 +35,8 @@ export function HomeTab() {
     <div className="fade-in flex flex-col gap-6">
       {/* Balance card */}
       <div className="premium-navy-card relative overflow-hidden rounded-[2rem] p-7 text-white shadow-2xl">
+        {/* UAE flag accent strip — top of balance card */}
+        <div className="uae-flag-accent absolute left-0 right-0 top-0 h-1 opacity-80" />
         <div className="relative z-10 mb-6 flex items-start justify-between">
           <div>
             <div className="mb-2 flex items-center gap-2">
@@ -86,14 +88,14 @@ export function HomeTab() {
         <div className="relative z-10 flex gap-3">
           <button
             onClick={() => openSubPage("receive")}
-            className="active-scale flex flex-1 items-center justify-center gap-2 rounded-[1rem] bg-white py-3.5 text-[13px] font-black text-indigo-950 shadow-lg transition-colors hover:bg-slate-100"
+            className="active-scale flex flex-1 items-center justify-center gap-2 rounded-[1rem] bg-white py-3.5 text-[13px] font-black text-emerald-950 shadow-lg transition-colors hover:bg-slate-100"
           >
             <ArrowDownToLine className="h-4 w-4 stroke-[2.5]" />
             Add Funds
           </button>
           <button
             onClick={() => setTab("payments")}
-            className="active-scale flex flex-1 items-center justify-center gap-2 rounded-[1rem] border border-indigo-400/30 bg-indigo-600/30 py-3.5 text-[13px] font-black text-white backdrop-blur-md transition-colors hover:bg-indigo-600/50"
+            className="active-scale flex flex-1 items-center justify-center gap-2 rounded-[1rem] border border-amber-400/30 bg-amber-500/20 py-3.5 text-[13px] font-black text-white backdrop-blur-md transition-colors hover:bg-amber-500/30"
           >
             <Send className="h-4 w-4 stroke-[2.5]" />
             Send Money
@@ -132,7 +134,7 @@ export function HomeTab() {
       {/* Monthly spending */}
       <button
         onClick={() => openSubPage("analytics")}
-        className="active-scale rounded-[1.5rem] border border-slate-200 bg-white p-5 text-left shadow-sm transition-colors hover:border-indigo-300"
+        className="active-scale rounded-[1.5rem] border border-slate-200 bg-white p-5 text-left shadow-sm transition-colors hover:border-emerald-300"
       >
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-sm font-bold text-slate-900">Monthly Spending</h3>
@@ -162,7 +164,7 @@ export function HomeTab() {
           </h2>
           <button
             onClick={() => openSubPage("all-transactions")}
-            className="rounded-full bg-indigo-50 px-3 py-1.5 text-xs font-bold text-indigo-600 transition-colors hover:text-indigo-800"
+            className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700 transition-colors hover:text-emerald-900"
           >
             View All
           </button>

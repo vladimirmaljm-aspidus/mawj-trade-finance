@@ -76,7 +76,7 @@ export function TaxesPage() {
               className="active-scale flex w-full items-center justify-between border-b border-slate-50 p-4 text-left transition-colors last:border-0 hover:bg-slate-50"
             >
               <span className="text-sm font-black text-slate-900">{s}</span>
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
                 <Download className="h-4 w-4 stroke-[2.5]" />
               </span>
             </button>

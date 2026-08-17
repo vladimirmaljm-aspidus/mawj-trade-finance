@@ -35,7 +35,7 @@ export function AllTransactionsPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search…"
-            className="w-40 rounded-full border border-slate-200 bg-white py-2 pl-9 pr-3 text-xs font-bold text-slate-900 outline-none focus:border-indigo-400 sm:w-52"
+            className="w-40 rounded-full border border-slate-200 bg-white py-2 pl-9 pr-3 text-xs font-bold text-slate-900 outline-none focus:border-emerald-400 sm:w-52"
           />
         </div>
       }
@@ -69,7 +69,7 @@ export function AllTransactionsPage() {
                 setQuery("");
                 setFilter("all");
               }}
-              className="mt-3 text-xs font-bold text-indigo-600"
+              className="mt-3 text-xs font-bold text-emerald-700"
             >
               Clear filters
             </button>
