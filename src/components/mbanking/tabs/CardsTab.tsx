@@ -10,16 +10,39 @@ import {
   SlidersHorizontal,
   Eye,
   ChevronRight,
+  ScanFace,
+  Check,
+  X,
 } from "lucide-react";
 import { useMbanking } from "@/lib/mbanking/store";
 import { toast } from "@/lib/mbanking/toast";
 import { cn } from "@/lib/utils";
 import { formatEUR } from "@/lib/mbanking/format";
+import { SpendingLimitsModal } from "../SpendingLimitsModal";
+import type { CardInfo } from "@/lib/mbanking/types";
 
 export function CardsTab() {
-  const { cards, toggleCardFreeze } = useMbanking();
+  const cards = useMbanking((s) => s.cards);
+  const toggleCardFreeze = useMbanking((s) => s.toggleCardFreeze);
   const physical = cards.find((c) => c.kind === "physical")!;
   const virtual = cards.find((c) => c.kind === "virtual")!;
+
+  const [limitsCard, setLimitsCard] = useState<CardInfo | null>(null);
+  const [revealCard, setRevealCard] = useState<CardInfo | null>(null);
+  const [revealed, setRevealed] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+
+  const startReveal = (card: CardInfo) => {
+    setRevealCard(card);
+    setRevealed(false);
+    setVerifying(true);
+    // Simulate biometric scan (in production this would call WebAuthn).
+    setTimeout(() => {
+      setVerifying(false);
+      setRevealed(true);
+      toast("Identity verified. Card details revealed.", "success");
+    }, 1200);
+  };
 
   return (
     <div className="fade-in flex flex-col gap-6">
@@ -171,12 +194,7 @@ export function CardsTab() {
 
         {/* Spending limits */}
         <button
-          onClick={() =>
-            toast(
-              `Daily ${formatEUR(physical.dailyLimit)} / Monthly ${formatEUR(physical.monthlyLimit)}`,
-              "info"
-            )
-          }
+          onClick={() => setLimitsCard(physical)}
           className="active-scale flex w-full items-center justify-between border-b border-slate-100 p-5 text-left transition-colors hover:bg-slate-50"
         >
           <div className="flex items-center gap-4">
@@ -186,8 +204,8 @@ export function CardsTab() {
             <div>
               <p className="text-sm font-black text-slate-900">Spending Limits</p>
               <p className="mt-0.5 text-xs font-semibold text-slate-500">
-                {formatEUR(physical.dailyLimit)} daily /{" "}
-                {formatEUR(physical.monthlyLimit)} monthly
+                {formatEUR(physical.daily_limit)} daily /{" "}
+                {formatEUR(physical.monthly_limit)} monthly
               </p>
             </div>
           </div>
@@ -196,7 +214,7 @@ export function CardsTab() {
 
         {/* Reveal PIN */}
         <button
-          onClick={() => toast("FaceID verification required", "info")}
+          onClick={() => startReveal(physical)}
           className="active-scale flex w-full items-center justify-between p-5 text-left transition-colors hover:bg-slate-50"
         >
           <div className="flex items-center gap-4">
@@ -212,6 +230,141 @@ export function CardsTab() {
           </div>
           <ChevronRight className="h-5 w-5 text-slate-300" />
         </button>
+      </div>
+
+      {/* Spending limits modal */}
+      {limitsCard && (
+        <SpendingLimitsModal
+          card={limitsCard}
+          onClose={() => setLimitsCard(null)}
+        />
+      )}
+
+      {/* Card reveal modal (biometric-gated) */}
+      {revealCard && (
+        <RevealCardModal
+          card={revealCard}
+          verifying={verifying}
+          revealed={revealed}
+          onClose={() => {
+            setRevealCard(null);
+            setRevealed(false);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+/** Biometric-gated card details reveal modal. */
+function RevealCardModal({
+  card,
+  verifying,
+  revealed,
+  onClose,
+}: {
+  card: CardInfo;
+  verifying: boolean;
+  revealed: boolean;
+  onClose: () => void;
+}) {
+  // Demo: a simulated PIN derived from the card number (last 4 + middle 2).
+  const pin = `${card.number.replace(/\s/g, "").slice(-4)}`.split("").map((d, i) => (i % 2 === 0 ? d : "•")).join("");
+  const cvv = (card.number.replace(/\s/g, "").slice(-3));
+
+  return (
+    <div
+      className="fixed inset-0 z-[85] flex items-end justify-center bg-slate-900/60 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="aspidus-sheet w-full max-w-md rounded-t-[2rem] bg-white p-6 pb-8 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-slate-200" />
+
+        <div className="mb-5 flex items-center justify-between">
+          <div>
+            <h2 className="text-base font-black text-slate-900">Card Details</h2>
+            <p className="text-xs font-semibold text-slate-500">{card.label}</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100"
+            aria-label="Close"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {verifying ? (
+          <div className="flex flex-col items-center py-10">
+            <div className="flex h-24 w-24 items-center justify-center rounded-full border border-slate-200 bg-slate-50">
+              <ScanFace className="h-12 w-12 animate-pulse text-slate-700" />
+            </div>
+            <p className="mt-5 text-xs font-bold uppercase tracking-widest text-slate-500">
+              Scanning biometrics…
+            </p>
+            <p className="mt-1 text-[10px] font-medium text-slate-400">
+              Look at the camera / touch the sensor
+            </p>
+          </div>
+        ) : revealed ? (
+          <div className="flex flex-col gap-3">
+            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+              <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                Card Number
+              </p>
+              <p className="font-mono text-base font-black tracking-wider text-slate-900">
+                {card.number}
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                  PIN
+                </p>
+                <p className="font-mono text-lg font-black tracking-[0.4em] text-slate-900">
+                  {pin}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                  CVV
+                </p>
+                <p className="font-mono text-lg font-black tracking-[0.4em] text-slate-900">
+                  {cvv}
+                </p>
+              </div>
+            </div>
+            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+              <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                Expiry · Holder
+              </p>
+              <p className="text-sm font-black text-slate-900">
+                {card.exp} · {card.holder}
+              </p>
+            </div>
+            <div className="mt-2 flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700">
+              <Check className="h-3.5 w-3.5 shrink-0" />
+              Identity verified — details will hide when you close this.
+            </div>
+          </div>
+        ) : null}
+
+        <style jsx>{`
+          .aspidus-sheet {
+            animation: aspidus-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          }
+          @keyframes aspidus-up {
+            from {
+              transform: translateY(100%);
+            }
+            to {
+              transform: translateY(0);
+            }
+          }
+        `}</style>
       </div>
     </div>
   );
@@ -231,7 +384,7 @@ function ToggleSwitch({
       onClick={onChange}
       className={cn(
         "active-scale relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full transition-colors",
-        checked ? "bg-emerald-700" : "bg-slate-200"
+        checked ? "bg-slate-900" : "bg-slate-200"
       )}
     >
       <span

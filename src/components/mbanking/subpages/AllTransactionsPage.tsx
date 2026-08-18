@@ -69,7 +69,7 @@ export function AllTransactionsPage() {
                 setQuery("");
                 setFilter("all");
               }}
-              className="mt-3 text-xs font-bold text-emerald-700"
+              className="mt-3 text-xs font-bold text-slate-500"
             >
               Clear filters
             </button>

@@ -4,6 +4,7 @@ import { Bell, Star, ShieldCheck } from "lucide-react";
 import { toast } from "@/lib/mbanking/toast";
 import { getGreeting } from "@/lib/mbanking/format";
 import { BANK, useMbanking } from "@/lib/mbanking/store";
+import { NotificationsPanel } from "./NotificationsPanel";
 
 export function Header() {
   const greeting = getGreeting();
@@ -33,7 +34,7 @@ export function Header() {
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-emerald-700">
+        <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-amber-700">
           <ShieldCheck className="h-3 w-3" />
           <span className="hidden xs:inline">Secured</span>
         </div>
@@ -67,14 +68,7 @@ export function Header() {
             </h1>
           </div>
         </div>
-        <button
-          onClick={() => toast("Your treasury alerts are synced", "info")}
-          className="active-scale relative flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition-colors hover:bg-slate-50"
-          aria-label="Notifications"
-        >
-          <Bell className="h-[1.2rem] w-[1.2rem]" />
-          <span className="absolute right-[0.7rem] top-[0.6rem] h-2.5 w-2.5 animate-pulse rounded-full border-2 border-white bg-rose-500" />
-        </button>
+        <NotificationsPanel />
       </div>
     </header>
   );

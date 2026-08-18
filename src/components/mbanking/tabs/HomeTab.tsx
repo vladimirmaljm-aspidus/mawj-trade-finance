@@ -88,7 +88,7 @@ export function HomeTab() {
         <div className="relative z-10 flex gap-3">
           <button
             onClick={() => openSubPage("receive")}
-            className="active-scale flex flex-1 items-center justify-center gap-2 rounded-[1rem] bg-white py-3.5 text-[13px] font-black text-emerald-950 shadow-lg transition-colors hover:bg-slate-100"
+            className="active-scale flex flex-1 items-center justify-center gap-2 rounded-[1rem] bg-white py-3.5 text-[13px] font-black text-slate-900 shadow-lg transition-colors hover:bg-slate-100"
           >
             <ArrowDownToLine className="h-4 w-4 stroke-[2.5]" />
             Add Funds
@@ -134,7 +134,7 @@ export function HomeTab() {
       {/* Monthly spending */}
       <button
         onClick={() => openSubPage("analytics")}
-        className="active-scale rounded-[1.5rem] border border-slate-200 bg-white p-5 text-left shadow-sm transition-colors hover:border-emerald-300"
+        className="active-scale rounded-[1.5rem] border border-slate-200 bg-white p-5 text-left shadow-sm transition-colors hover:border-slate-400"
       >
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-sm font-bold text-slate-900">Monthly Spending</h3>
@@ -164,7 +164,7 @@ export function HomeTab() {
           </h2>
           <button
             onClick={() => openSubPage("all-transactions")}
-            className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700 transition-colors hover:text-emerald-900"
+            className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-700 transition-colors hover:text-slate-900"
           >
             View All
           </button>

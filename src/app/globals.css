@@ -125,7 +125,8 @@
   }
 
   /* UAE flag accent strip — 4 horizontal bands (red, green, white, black).
-     Used as a subtle national-identity accent on cards and headers. */
+     Used as a subtle national-identity accent on cards and headers.
+     NOTE: This is the horizontal-strip variant (decorative accent). */
   .uae-flag-accent {
     background: linear-gradient(
       to bottom,
@@ -134,6 +135,19 @@
       #FFFFFF 50%, #FFFFFF 75%,
       #000000 75%, #000000 100%
     );
+  }
+
+  /* Proper UAE flag element — vertical red bar on the left (1/4 width),
+     then 3 horizontal bands (green / white / black) on the right.
+     This is the actual UAE national flag layout. Use .uae-flag for a
+     real flag badge; .uae-flag-accent for a thin decorative strip. */
+  .uae-flag {
+    background:
+      linear-gradient(to right, #C8102E 0%, #C8102E 25%, transparent 25%),
+      linear-gradient(to bottom,
+        #007A3D 0%, #007A3D 33.33%,
+        #FFFFFF 33.33%, #FFFFFF 66.66%,
+        #000000 66.66%, #000000 100%);
   }
 
   /* Platinum virtual card */

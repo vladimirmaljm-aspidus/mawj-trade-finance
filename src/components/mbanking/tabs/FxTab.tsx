@@ -149,7 +149,7 @@ export function FxTab() {
         {/* Swap */}
         <button
           onClick={swap}
-          className="active-scale absolute left-1/2 top-1/2 z-10 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-4 border-white bg-emerald-700 text-white shadow-lg transition-transform duration-500 hover:rotate-180"
+          className="active-scale absolute left-1/2 top-1/2 z-10 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-4 border-white bg-slate-900 text-white shadow-lg transition-transform duration-500 hover:rotate-180"
           aria-label="Swap currencies"
         >
           <ArrowDownUp className="h-5 w-5 stroke-[2.5]" />
