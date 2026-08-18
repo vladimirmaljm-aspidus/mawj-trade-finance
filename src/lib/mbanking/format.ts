@@ -1,4 +1,4 @@
-/** Currency + number formatting helpers for the Aspidus treasury app. */
+/** Currency + number formatting helpers for the CBI treasury app. */
 
 const eurFormatter = new Intl.NumberFormat("en-IE", {
   style: "currency",
@@ -84,5 +84,31 @@ export function timeLabel(ts: number): string {
   return new Date(ts).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
+  });
+}
+
+/** EUR → AED conversion rate (live value comes from /api/me fxRates, but we
+    keep a static fallback so client-side helpers work before hydration). */
+export const EUR_TO_AED_FALLBACK = 3.9545;
+
+/** Convert any EUR amount to AED using the given rate (or fallback). */
+export function eurToAed(amount: number, rate?: number): number {
+  return amount * (rate ?? EUR_TO_AED_FALLBACK);
+}
+
+/** Format the AED equivalent of an EUR amount, e.g. "≈ AED 492,316,432".
+    Uses the provided EUR→AED rate (from /api/me fxRates) or the fallback. */
+export function formatAedEquivalent(eurAmount: number, rate?: number): string {
+  return `≈ ${aedFormatter.format(eurToAed(eurAmount, rate))}`;
+}
+
+/** Format a relative date label grouped by month for transaction lists. */
+export function monthGroupLabel(ts: number | string | Date): string {
+  const d = ts instanceof Date ? ts : new Date(ts);
+  const now = new Date();
+  const sameYear = d.getFullYear() === now.getFullYear();
+  return d.toLocaleDateString("en-GB", {
+    month: "long",
+    year: sameYear ? undefined : "numeric",
   });
 }

@@ -3,7 +3,7 @@
 import { Plus, Lock } from "lucide-react";
 import { SubPage } from "../SubPage";
 import { useMbanking } from "@/lib/mbanking/store";
-import { formatCurrency } from "@/lib/mbanking/format";
+import { formatCurrency, formatAED } from "@/lib/mbanking/format";
 import { toast } from "@/lib/mbanking/toast";
 import { cn } from "@/lib/utils";
 import type { Account } from "@/lib/mbanking/types";
@@ -77,9 +77,20 @@ function AccountCard({ account }: { account: Account }) {
           </span>
         )}
       </div>
-      <h2 className="relative z-10 mb-6 text-3xl font-black tracking-tighter">
+      <h2 className="relative z-10 mb-1 text-3xl font-black tracking-tighter">
         {formatCurrency(account.balance, account.currency)}
       </h2>
+      {account.currency !== "AED" && (
+        <p
+          className={cn(
+            "relative z-10 mb-5 text-[11px] font-semibold",
+            isPrimary ? "text-amber-300/80" : "text-slate-500"
+          )}
+        >
+          ≈ {formatAED(account.balance * 3.9545)}
+        </p>
+      )}
+      {account.currency === "AED" && <div className="relative z-10 mb-5" />}
       <p
         className={cn(
           "relative z-10 font-mono text-xs font-bold",

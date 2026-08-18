@@ -13,7 +13,7 @@ import {
   Lock,
 } from "lucide-react";
 import { useMbanking } from "@/lib/mbanking/store";
-import { formatBalanceParts, formatEUR } from "@/lib/mbanking/format";
+import { formatBalanceParts, formatEUR, formatAedEquivalent } from "@/lib/mbanking/format";
 import { useNav } from "../nav";
 import { TransactionItem } from "../ui/TransactionItem";
 import { ComplianceBanner } from "../ComplianceBanner";
@@ -26,10 +26,15 @@ export function HomeTab() {
   const hideBalance = useMbanking((s) => s.hideBalance);
   const setHideBalance = useMbanking((s) => s.setHideBalance);
   const complianceCase = useMbanking((s) => s.complianceCase);
+  const fxRates = useMbanking((s) => s.fxRates);
   const { openSubPage, setTab } = useNav();
 
   const { whole, cents } = formatBalanceParts(balance);
-  const recent = transactions.slice(0, 4);
+  const recent = transactions.slice(0, 5);
+
+  // EUR → AED rate from live fxRates (fallback 3.9545 if not loaded).
+  const eurAedRate =
+    fxRates.find((r) => r.base === "EUR" && r.quote === "AED")?.rate ?? 3.9545;
 
   // Monthly spending: sum of expenses in the last 30 days, capped to a 10M limit for the bar.
   const monthExpenses = transactions
@@ -79,9 +84,14 @@ export function HomeTab() {
                 ••••••••
               </h1>
             ) : (
-              <h1 className="text-[2.5rem] font-black leading-none tracking-tighter text-white drop-shadow-md">
-                €{whole}.<span className="text-2xl font-bold text-slate-400">{cents}</span>
-              </h1>
+              <>
+                <h1 className="text-[2.5rem] font-black leading-none tracking-tighter text-white drop-shadow-md">
+                  €{whole}.<span className="text-2xl font-bold text-slate-400">{cents}</span>
+                </h1>
+                <p className="mt-2 text-[11px] font-semibold text-slate-400">
+                  {formatAedEquivalent(balance, eurAedRate)}
+                </p>
+              </>
             )}
           </div>
         </div>
