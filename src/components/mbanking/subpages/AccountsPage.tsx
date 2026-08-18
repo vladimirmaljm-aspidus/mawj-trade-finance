@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Plus, Lock } from "lucide-react";
 import { SubPage } from "../SubPage";
 import { useMbanking } from "@/lib/mbanking/store";
 import { formatCurrency } from "@/lib/mbanking/format";
@@ -43,6 +43,7 @@ export function AccountsPage() {
 
 function AccountCard({ account }: { account: Account }) {
   const isPrimary = account.primary;
+  const complianceCase = useMbanking((s) => s.complianceCase);
   return (
     <div
       className={cn(
@@ -52,6 +53,15 @@ function AccountCard({ account }: { account: Account }) {
           : "border border-slate-200 bg-white text-slate-900"
       )}
     >
+      {/* BLOCKED overlay when compliance case is active */}
+      {complianceCase && (
+        <div className="absolute right-3 top-3 z-20 flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-amber-500/90 px-2.5 py-1 shadow-sm">
+          <Lock className="h-3 w-3 text-white" />
+          <span className="text-[9px] font-black uppercase tracking-widest text-white">
+            Blocked
+          </span>
+        </div>
+      )}
       <div className="relative z-10 mb-2 flex items-center justify-between">
         <p
           className={cn(

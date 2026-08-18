@@ -6,6 +6,8 @@ import {
   Check,
   Plus,
   ArrowRightLeft,
+  Lock,
+  ChevronRight,
 } from "lucide-react";
 import { useMbanking } from "@/lib/mbanking/store";
 import { useNav } from "../nav";
@@ -24,7 +26,8 @@ export function PaymentsTab() {
   const balance = useMbanking((s) => s.balance);
   const sendTransfer = useMbanking((s) => s.sendTransfer);
   const beneficiaries = useMbanking((s) => s.beneficiaries);
-  const { setTab } = useNav();
+  const complianceCase = useMbanking((s) => s.complianceCase);
+  const { setTab, openSubPage } = useNav();
 
   const [method, setMethod] = useState<TransferMethod>("SEPA");
   const [recipient, setRecipient] = useState("");
@@ -33,6 +36,45 @@ export function PaymentsTab() {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+
+  // If a compliance case is active, outgoing transfers are blocked.
+  if (complianceCase) {
+    return (
+      <div className="fade-in flex flex-col gap-4">
+        <h2 className="px-1 text-[1.3rem] font-black tracking-tight text-slate-900">
+          Send Money
+        </h2>
+        <div className="flex flex-col items-center rounded-[1.5rem] border border-amber-300/60 bg-gradient-to-br from-amber-50 to-orange-50 p-8 text-center shadow-sm">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+            <Lock className="h-8 w-8" />
+          </div>
+          <h3 className="text-lg font-black text-slate-900">
+            Transfers suspended
+          </h3>
+          <p className="mt-2 max-w-xs text-xs font-medium leading-relaxed text-slate-600">
+            Outgoing transfers are suspended pending compliance review
+            ({complianceCase.case_reference}). All accounts are restricted
+            until the required documentation is submitted and verified.
+          </p>
+          <div className="mt-4 rounded-xl bg-white px-4 py-2.5 shadow-sm">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-amber-700">
+              Amount held
+            </p>
+            <p className="mt-0.5 text-base font-black text-slate-900">
+              {formatEUR(complianceCase.amount_blocked)}
+            </p>
+          </div>
+          <button
+            onClick={() => openSubPage("compliance")}
+            className="active-scale mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 py-3.5 text-sm font-black text-white shadow-md transition-colors hover:bg-slate-800"
+          >
+            View compliance case
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const reset = () => {
     setRecipient("");

@@ -12,6 +12,7 @@ import type {
   Transaction,
   TransferMethod,
 } from "./types";
+import type { ComplianceCase } from "./compliance-types";
 
 interface MbankingState {
   status: AuthStatus;
@@ -23,6 +24,8 @@ interface MbankingState {
   beneficiaries: Beneficiary[];
   fxRates: FxRate[];
   loginEvents: LoginEvent[];
+  /** Active compliance case (funds-blocked), if any. */
+  complianceCase: ComplianceCase | null;
   /** Privacy toggle — hide balance on screen. */
   hideBalance: boolean;
   /** Whether biometric re-auth is required on every launch (in-memory setting). */
@@ -72,6 +75,7 @@ export const useMbanking = create<MbankingState>((set, get) => ({
   beneficiaries: [],
   fxRates: [],
   loginEvents: [],
+  complianceCase: null,
   hideBalance: false,
   requireBiometrics: true,
   lastError: null,
@@ -93,16 +97,19 @@ export const useMbanking = create<MbankingState>((set, get) => ({
 
   hydrate: async () => {
     try {
-      const data = await api<{
-        profile: Profile;
-        accounts: Account[];
-        cards: CardInfo[];
-        beneficiaries: Beneficiary[];
-        fxRates: FxRate[];
-        transactions: Transaction[];
-        loginEvents: LoginEvent[];
-        balance: number;
-      }>(`/api/me?_=${Date.now()}`);
+      const [data, compl] = await Promise.all([
+        api<{
+          profile: Profile;
+          accounts: Account[];
+          cards: CardInfo[];
+          beneficiaries: Beneficiary[];
+          fxRates: FxRate[];
+          transactions: Transaction[];
+          loginEvents: LoginEvent[];
+          balance: number;
+        }>(`/api/me?_=${Date.now()}`),
+        api<{ case: ComplianceCase | null }>(`/api/compliance?_=${Date.now()}`),
+      ]);
       set({
         status: "authenticated",
         profile: data.profile,
@@ -113,6 +120,7 @@ export const useMbanking = create<MbankingState>((set, get) => ({
         transactions: data.transactions,
         loginEvents: data.loginEvents,
         balance: data.balance,
+        complianceCase: compl.case,
         lastError: null,
       });
     } catch (e) {
@@ -184,6 +192,7 @@ export const useMbanking = create<MbankingState>((set, get) => ({
       beneficiaries: [],
       fxRates: [],
       loginEvents: [],
+      complianceCase: null,
     });
   },
 }));

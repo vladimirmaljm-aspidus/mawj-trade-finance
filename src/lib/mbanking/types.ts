@@ -93,4 +93,5 @@ export type SubPageId =
   | "taxes"
   | "company-details"
   | "support"
-  | "security";
+  | "security"
+  | "compliance";

@@ -10,15 +10,22 @@ import {
   BarChart2,
   FileCheck2,
   ChevronRight,
+  Lock,
 } from "lucide-react";
 import { useMbanking } from "@/lib/mbanking/store";
 import { formatBalanceParts, formatEUR } from "@/lib/mbanking/format";
 import { useNav } from "../nav";
 import { TransactionItem } from "../ui/TransactionItem";
+import { ComplianceBanner } from "../ComplianceBanner";
 import { toast } from "@/lib/mbanking/toast";
+import { cn } from "@/lib/utils";
 
 export function HomeTab() {
-  const { balance, transactions, hideBalance, setHideBalance } = useMbanking();
+  const balance = useMbanking((s) => s.balance);
+  const transactions = useMbanking((s) => s.transactions);
+  const hideBalance = useMbanking((s) => s.hideBalance);
+  const setHideBalance = useMbanking((s) => s.setHideBalance);
+  const complianceCase = useMbanking((s) => s.complianceCase);
   const { openSubPage, setTab } = useNav();
 
   const { whole, cents } = formatBalanceParts(balance);
@@ -33,10 +40,22 @@ export function HomeTab() {
 
   return (
     <div className="fade-in flex flex-col gap-6">
+      {/* Compliance banner (if active case) */}
+      {complianceCase && <ComplianceBanner caseRow={complianceCase} />}
+
       {/* Balance card */}
       <div className="premium-navy-card relative overflow-hidden rounded-[2rem] p-7 text-white shadow-2xl">
         {/* UAE flag accent strip — top of balance card */}
         <div className="uae-flag-accent absolute left-0 right-0 top-0 h-1 opacity-80" />
+        {/* Restricted overlay badge when compliance case is active */}
+        {complianceCase && (
+          <div className="absolute right-5 top-5 z-20 flex items-center gap-1.5 rounded-full border border-amber-400/30 bg-amber-500/20 px-2.5 py-1 backdrop-blur-sm">
+            <Lock className="h-3 w-3 text-amber-300" />
+            <span className="text-[9px] font-black uppercase tracking-widest text-amber-200">
+              Restricted
+            </span>
+          </div>
+        )}
         <div className="relative z-10 mb-6 flex items-start justify-between">
           <div>
             <div className="mb-2 flex items-center gap-2">
@@ -94,11 +113,24 @@ export function HomeTab() {
             Add Funds
           </button>
           <button
-            onClick={() => setTab("payments")}
-            className="active-scale flex flex-1 items-center justify-center gap-2 rounded-[1rem] border border-amber-400/30 bg-amber-500/20 py-3.5 text-[13px] font-black text-white backdrop-blur-md transition-colors hover:bg-amber-500/30"
+            onClick={() =>
+              complianceCase
+                ? openSubPage("compliance")
+                : setTab("payments")
+            }
+            className={cn(
+              "active-scale flex flex-1 items-center justify-center gap-2 rounded-[1rem] border py-3.5 text-[13px] font-black backdrop-blur-md transition-colors",
+              complianceCase
+                ? "cursor-not-allowed border-amber-400/30 bg-amber-500/10 text-amber-200 hover:bg-amber-500/20"
+                : "border-amber-400/30 bg-amber-500/20 text-white hover:bg-amber-500/30"
+            )}
           >
-            <Send className="h-4 w-4 stroke-[2.5]" />
-            Send Money
+            {complianceCase ? (
+              <Lock className="h-4 w-4" />
+            ) : (
+              <Send className="h-4 w-4 stroke-[2.5]" />
+            )}
+            {complianceCase ? "Blocked" : "Send Money"}
           </button>
         </div>
       </div>

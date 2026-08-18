@@ -22,6 +22,7 @@ import { TaxesPage } from "./subpages/TaxesPage";
 import { CompanyDetailsPage } from "./subpages/CompanyDetailsPage";
 import { SupportPage } from "./subpages/SupportPage";
 import { SecurityPage } from "./subpages/SecurityPage";
+import { CompliancePage } from "./subpages/CompliancePage";
 import type { TabId } from "@/lib/mbanking/types";
 
 export function MbankingApp() {
@@ -114,6 +115,8 @@ function ActiveSubPage() {
       return <SupportPage />;
     case "security":
       return <SecurityPage />;
+    case "compliance":
+      return <CompliancePage />;
     default:
       return null;
   }
