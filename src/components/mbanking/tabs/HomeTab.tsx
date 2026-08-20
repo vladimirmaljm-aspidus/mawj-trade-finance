@@ -36,9 +36,15 @@ export function HomeTab() {
   const eurAedRate =
     fxRates.find((r) => r.base === "EUR" && r.quote === "AED")?.rate ?? 3.9545;
 
-  // Monthly spending: sum of expenses in the last 30 days, capped to a 10M limit for the bar.
+  // Monthly spending: only Settled expenses (exclude Rejected + Processing/blocked).
+  // Restricted to EUR treasury account so the figure is meaningful for the card.
   const monthExpenses = transactions
-    .filter((t) => t.type === "expense")
+    .filter(
+      (t) =>
+        t.type === "expense" &&
+        t.status === "Settled" &&
+        t.currency === "EUR"
+    )
     .reduce((sum, t) => sum + t.amount, 0);
   const monthlyLimit = 10_000_000;
   const spentPct = Math.min(100, Math.round((monthExpenses / monthlyLimit) * 100));

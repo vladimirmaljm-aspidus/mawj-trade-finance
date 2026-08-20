@@ -2,9 +2,16 @@
 
 import { ArrowDownLeft, ArrowUpRight, Ban } from "lucide-react";
 import type { Transaction } from "@/lib/mbanking/types";
-import { formatEUR, relativeDateLabel, timeLabel } from "@/lib/mbanking/format";
+import { formatEUR, formatUSD, formatAED, relativeDateLabel, timeLabel } from "@/lib/mbanking/format";
 import { useNav } from "../nav";
 import { cn } from "@/lib/utils";
+
+/** Format amount using the transaction's own currency. */
+function formatAmount(amount: number, currency: string): string {
+  if (currency === "USD") return formatUSD(amount);
+  if (currency === "AED") return formatAED(amount);
+  return formatEUR(amount);
+}
 
 interface TransactionItemProps {
   tx: Transaction;
@@ -50,10 +57,10 @@ export function TransactionItem({ tx, compact }: TransactionItemProps) {
         isRejected && "opacity-75"
       )}
     >
-      <div className="flex items-center gap-3.5">
+      <div className="flex min-w-0 flex-1 items-center gap-3.5">
         <div
           className={cn(
-            "relative flex h-11 w-11 items-center justify-center rounded-[0.8rem] text-[13px] font-black shadow-sm",
+            "relative flex h-11 w-11 shrink-0 items-center justify-center rounded-[0.8rem] text-[13px] font-black shadow-sm",
             isRejected
               ? "bg-rose-50 text-rose-600 border border-rose-200"
               : badgeClass
@@ -69,7 +76,7 @@ export function TransactionItem({ tx, compact }: TransactionItemProps) {
             <ArrowUpRight className="h-5 w-5" />
           )}
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <p className="truncate text-sm font-black tracking-tight text-slate-900">
               {tx.counterparty}
@@ -85,14 +92,17 @@ export function TransactionItem({ tx, compact }: TransactionItemProps) {
               </span>
             )}
           </div>
-          <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-slate-400">
+          <p className="mt-0.5 truncate text-[9px] font-bold uppercase tracking-widest text-slate-400">
             {compact ? dateLabel : `${dateLabel} • ${time}`}
           </p>
         </div>
       </div>
-      <div className={cn("text-sm font-black", amountColor)}>
+      <div className={cn(
+        "shrink-0 whitespace-nowrap pl-2 text-right text-sm font-black",
+        amountColor
+      )}>
         {sign}
-        {formatEUR(tx.amount)}
+        {formatAmount(tx.amount, tx.currency)}
       </div>
     </button>
   );

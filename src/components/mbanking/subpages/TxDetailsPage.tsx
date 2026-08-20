@@ -4,9 +4,16 @@ import { CheckCircle2, ArrowDownToLine, ArrowDownLeft, ArrowUpRight, Ban } from 
 import { SubPage } from "../SubPage";
 import { useMbanking } from "@/lib/mbanking/store";
 import { useNav } from "../nav";
-import { formatEUR } from "@/lib/mbanking/format";
+import { formatEUR, formatUSD, formatAED } from "@/lib/mbanking/format";
 import { toast } from "@/lib/mbanking/toast";
 import { cn } from "@/lib/utils";
+
+/** Format amount using the transaction's own currency. */
+function formatAmount(amount: number, currency: string): string {
+  if (currency === "USD") return formatUSD(amount);
+  if (currency === "AED") return formatAED(amount);
+  return formatEUR(amount);
+}
 
 const TONE_CLASS: Record<string, string> = {
   indigo: "bg-emerald-50 text-emerald-700 border border-emerald-100",
@@ -80,7 +87,7 @@ export function TxDetailsPage() {
     y += 30;
     doc.setFontSize(22);
     doc.setTextColor(isIncome ? 5 : 30, isIncome ? 150 : 30, isIncome ? 105 : 30);
-    doc.text(`${sign}${formatEUR(tx.amount)}`, 40, y);
+    doc.text(`${sign}${formatAmount(tx.amount, tx.currency)}`, 40, y);
 
     y += 24;
     doc.setTextColor(60, 60, 60);
@@ -166,7 +173,7 @@ export function TxDetailsPage() {
           )}
         >
           {sign}
-          {formatEUR(tx.amount)}
+          {formatAmount(tx.amount, tx.currency)}
         </h1>
 
         <div className="w-full rounded-[1.5rem] border border-slate-200 bg-white p-2 shadow-sm">
