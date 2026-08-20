@@ -1,15 +1,17 @@
 "use client";
 
-import { Plus, Lock } from "lucide-react";
+import { Plus, Lock, ChevronRight } from "lucide-react";
 import { SubPage } from "../SubPage";
 import { useMbanking } from "@/lib/mbanking/store";
 import { formatCurrency, formatAED } from "@/lib/mbanking/format";
 import { toast } from "@/lib/mbanking/toast";
+import { useNav } from "../nav";
 import { cn } from "@/lib/utils";
 import type { Account } from "@/lib/mbanking/types";
 
 export function AccountsPage() {
   const accounts = useMbanking((s) => s.accounts);
+  const { openSubPage } = useNav();
 
   return (
     <SubPage
@@ -99,6 +101,22 @@ function AccountCard({ account }: { account: Account }) {
       >
         …{account.iban.slice(-8)}
       </p>
+
+      <button
+        onClick={() => {
+          toast(`Showing transactions for ${account.label}`, "info");
+          openSubPage("all-transactions");
+        }}
+        className={cn(
+          "active-scale relative z-10 mt-4 flex w-full items-center justify-between rounded-xl border px-4 py-2.5 text-xs font-black transition-colors",
+          isPrimary
+            ? "border-white/20 bg-white/10 text-white hover:bg-white/20"
+            : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
+        )}
+      >
+        View transactions
+        <ChevronRight className="h-3.5 w-3.5" />
+      </button>
     </div>
   );
 }

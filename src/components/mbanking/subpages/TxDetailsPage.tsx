@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, ArrowDownToLine, ArrowDownLeft, ArrowUpRight } from "lucide-react";
+import { CheckCircle2, ArrowDownToLine, ArrowDownLeft, ArrowUpRight, Ban } from "lucide-react";
 import { SubPage } from "../SubPage";
 import { useMbanking } from "@/lib/mbanking/store";
 import { useNav } from "../nav";
@@ -176,10 +176,16 @@ export function TxDetailsPage() {
                 "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-sm font-black",
                 tx.status === "Settled"
                   ? "bg-emerald-50 text-emerald-600"
-                  : "bg-amber-50 text-amber-600"
+                  : tx.status === "Rejected"
+                    ? "bg-rose-50 text-rose-600"
+                    : "bg-amber-50 text-amber-600"
               )}
             >
-              <CheckCircle2 className="h-4 w-4" />
+              {tx.status === "Rejected" ? (
+                <Ban className="h-4 w-4" />
+              ) : (
+                <CheckCircle2 className="h-4 w-4" />
+              )}
               {tx.status}
             </span>
           </DetailRow>
@@ -204,8 +210,29 @@ export function TxDetailsPage() {
           </DetailRow>
         </div>
 
+        {/* Rejected warning box */}
+        {tx.status === "Rejected" && (
+          <div className="mt-4 w-full rounded-[1rem] border border-rose-200 bg-rose-50 p-4">
+            <div className="flex items-start gap-2.5">
+              <Ban className="mt-0.5 h-4 w-4 shrink-0 text-rose-600" />
+              <div>
+                <p className="text-xs font-black text-rose-900">Transaction Rejected</p>
+                <p className="mt-1 text-[11px] font-medium leading-relaxed text-rose-700">
+                  This transaction was refused by the bank. All accounts linked to
+                  Aspidus DMCC are restricted pending compliance review (Case CBI-CMP-2026-0047).
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {tx.memo && (
-          <div className="mt-4 w-full rounded-[1rem] border border-slate-200 bg-slate-50 p-4">
+          <div className={cn(
+            "mt-4 w-full rounded-[1rem] border p-4",
+            tx.status === "Rejected"
+              ? "border-rose-100 bg-rose-50/50"
+              : "border-slate-200 bg-slate-50"
+          )}>
             <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
               Memo
             </p>
