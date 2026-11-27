@@ -1,13 +1,16 @@
 // Aspidus DMCC — Service Worker
 // Caches the app shell for offline use and installability.
 
-const CACHE_VERSION = "aspidus-v3-cbi";
+const CACHE_VERSION = "aspidus-v4-cbi";
 const APP_SHELL = [
   "/",
   "/manifest.webmanifest",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
   "/icons/apple-touch-icon.png",
+  "/icons/cbi-logo-sm.png",
+  "/icons/cbi-logo-full.png",
+  "/icons/cbi-logo-white-sm.png",
 ];
 
 // Install: pre-cache the app shell.

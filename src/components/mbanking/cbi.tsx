@@ -28,60 +28,43 @@ export const CBI = {
   bodyGray: "#F7F7F7",
 };
 
-/* ---------- Logo: 8-spoke starburst + "CBI" wordmark ---------- */
-const SPOKE_COLORS = [
-  "#1F3A7A", // up
-  "#2E5FA3", // upper-right
-  "#B01E2E", // right
-  "#8FA3C0", // lower-right
-  "#16295E", // down
-  "#2E5FA3", // lower-left
-  "#C41F30", // left
-  "#9AA8BE", // upper-left
-];
+/* ---------- Logo: authentic CBI emblem, extracted 1:1 from the official brand render ---------- */
+/* cbi-logo-sm.png   (275×96)  — optimized for small heights (18–32px)            */
+/* cbi-logo-full.png (1400×488) — full resolution (splash / large)                  */
+/* cbi-logo-white*.png — white silhouette versions for dark surfaces (cards)       */
+const LOGO_ASPECT = 1400 / 488;
 
-export function CbiStarburst({ size = 22 }: { size?: number }) {
+export function CbiLogo({ height = 24 }: { height?: number }) {
+  const width = Math.round(height * LOGO_ASPECT);
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="-30 -30 60 60"
-      aria-hidden="true"
-      role="presentation"
-    >
-      {SPOKE_COLORS.map((color, i) => (
-        <path
-          key={i}
-          d="M -3.4 -7.5 L 3.4 -7.5 L 0 -27 Z"
-          fill={color}
-          transform={`rotate(${i * 45})`}
-        />
-      ))}
-    </svg>
+    <img
+      src="/icons/cbi-logo-sm.png"
+      srcSet="/icons/cbi-logo-sm.png 275w, /icons/cbi-logo-full.png 1400w"
+      sizes={`${width}px`}
+      alt="CBI — Commercial Bank International"
+      width={width}
+      height={height}
+      draggable={false}
+      decoding="async"
+      className="select-none"
+      style={{ width, height }}
+    />
   );
 }
 
-export function CbiLogo({
-  height = 24,
-  withWordmark = true,
-  wordmarkColor = CBI.navyLogo,
-}: {
-  height?: number;
-  withWordmark?: boolean;
-  wordmarkColor?: string;
-}) {
+export function CbiLogoWhite({ height = 24 }: { height?: number }) {
+  const width = Math.round(height * LOGO_ASPECT);
   return (
-    <span className="flex items-center gap-[5px] select-none">
-      <CbiStarburst size={height} />
-      {withWordmark && (
-        <span
-          className="font-bold leading-none tracking-tight"
-          style={{ color: wordmarkColor, fontSize: height * 1.35 }}
-        >
-          CBI
-        </span>
-      )}
-    </span>
+    <img
+      src="/icons/cbi-logo-white-sm.png"
+      alt="CBI — Commercial Bank International"
+      width={width}
+      height={height}
+      draggable={false}
+      decoding="async"
+      className="select-none"
+      style={{ width, height }}
+    />
   );
 }
 

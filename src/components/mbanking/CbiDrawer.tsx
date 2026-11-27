@@ -96,12 +96,14 @@ export function CbiDrawer({
             className="cbi-drawer-in flex h-full w-[80%] max-w-[320px] flex-col bg-white shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-        {/* Drawer brand header */}
-        <div className="cbi-header-gradient flex h-[64px] shrink-0 items-center">
-          <div className="pl-4">
-            <CbiLogo height={24} />
+        {/* Drawer brand header — pennant ribbon like the main header */}
+        <header className="cbi-header-gradient relative flex h-[64px] shrink-0 items-stretch">
+          <div className="relative flex w-[58%] items-center">
+            <div className="cbi-pennant relative flex h-full items-center bg-white pl-4">
+              <CbiLogo height={22} />
+            </div>
           </div>
-        </div>
+        </header>
         {/* Profile strip */}
         <div className="border-b border-[#D9D9D9] bg-[#F7F7F7] px-4 py-3">
           <p className="text-[14px] font-bold text-[#595959]">

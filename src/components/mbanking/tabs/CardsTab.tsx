@@ -19,7 +19,7 @@ import { toast } from "@/lib/mbanking/toast";
 import { cn } from "@/lib/utils";
 import { formatEUR } from "@/lib/mbanking/format";
 import { SpendingLimitsModal } from "../SpendingLimitsModal";
-import { CbiLogo, CbiSectionTitle, HexagonIcon } from "../cbi";
+import { CbiLogoWhite, CbiSectionTitle, HexagonIcon } from "../cbi";
 import type { CardInfo } from "@/lib/mbanking/types";
 
 export function CardsTab() {
@@ -77,7 +77,7 @@ export function CardsTab() {
         )}
 
         <div className="relative z-10 flex items-start justify-between">
-          <CbiLogo height={15} wordmarkColor="#FFFFFF" />
+          <CbiLogoWhite height={15} />
           <Wifi
             className="h-5 w-5 rotate-90 text-white/70"
             strokeWidth={1.6}
