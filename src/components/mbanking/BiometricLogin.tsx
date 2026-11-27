@@ -12,6 +12,12 @@ import type {
 } from "@simplewebauthn/browser";
 import { Fingerprint, ChevronLeft } from "lucide-react";
 import { CbiHeader, CbiFooter, CbiButton } from "./cbi";
+import { BranchAtmPage } from "./prelogin/BranchAtmPage";
+import { RegisterPage } from "./prelogin/RegisterPage";
+import { ContactUsPage } from "./prelogin/ContactUsPage";
+import { HelpPage } from "./prelogin/HelpPage";
+import { ForgotUsernamePage } from "./prelogin/ForgotUsernamePage";
+import { ForgotPasswordPage } from "./prelogin/ForgotPasswordPage";
 import { toast } from "@/lib/mbanking/toast";
 
 const CRED_ID_KEY = "cbi.credId";
@@ -27,7 +33,16 @@ function deviceLabel(): string {
   return "This device";
 }
 
-type LoginMode = "menu" | "username" | "password";
+type LoginMode =
+  | "menu"
+  | "username"
+  | "password"
+  | "branch-atm"
+  | "register"
+  | "contact"
+  | "help"
+  | "forgot-username"
+  | "forgot-password";
 
 interface Props {
   onAuthenticated: () => void;
@@ -136,8 +151,25 @@ export function BiometricLogin({ onAuthenticated }: Props) {
     }
   };
 
-  const demoNotice = (what: string) =>
-    toast(`${what} is not part of this demo. Use LOGIN or BIOMETRIC LOGIN.`, "info");
+  /* ---------- Pre-login full screens ---------- */
+  if (mode === "branch-atm") {
+    return <BranchAtmPage onBack={() => setMode("menu")} />;
+  }
+  if (mode === "register") {
+    return <RegisterPage onBack={() => setMode("menu")} />;
+  }
+  if (mode === "contact") {
+    return <ContactUsPage onBack={() => setMode("menu")} />;
+  }
+  if (mode === "help") {
+    return <HelpPage onBack={() => setMode("menu")} />;
+  }
+  if (mode === "forgot-username") {
+    return <ForgotUsernamePage onBack={() => setMode("menu")} />;
+  }
+  if (mode === "forgot-password") {
+    return <ForgotPasswordPage onBack={() => setMode("menu")} />;
+  }
 
   return (
     <div className="fixed inset-0 z-[200] flex flex-col bg-[#F7F7F7]">
@@ -149,8 +181,8 @@ export function BiometricLogin({ onAuthenticated }: Props) {
             {/* 4 stacked full-width buttons — like the real CBI pre-login */}
             <div className="flex flex-col gap-3">
               <CbiButton onClick={() => setMode("username")}>Login</CbiButton>
-              <CbiButton onClick={() => demoNotice("Register")}>Register</CbiButton>
-              <CbiButton onClick={() => demoNotice("Branch & ATM")}>Branch &amp; ATM</CbiButton>
+              <CbiButton onClick={() => setMode("register")}>Register</CbiButton>
+              <CbiButton onClick={() => setMode("branch-atm")}>Branch &amp; ATM</CbiButton>
               <CbiButton onClick={handleBiometric} disabled={busy}>
                 {busy ? "Please wait…" : "Biometric Login"}
               </CbiButton>
@@ -180,23 +212,23 @@ export function BiometricLogin({ onAuthenticated }: Props) {
             {/* Footer links row — like the real pre-login screen */}
             <div className="mt-5 flex items-start justify-between px-1 pb-2 text-[12px] text-[#000F32]">
               <div className="flex flex-col gap-2">
-                <button className="active:opacity-60" onClick={() => demoNotice("Contact Us")}>
+                <button className="active:opacity-60" onClick={() => setMode("contact")}>
                   Contact Us
                 </button>
-                <button className="active:opacity-60" onClick={() => demoNotice("Help")}>
+                <button className="active:opacity-60" onClick={() => setMode("help")}>
                   Help
                 </button>
               </div>
               <div className="flex flex-col items-end gap-2">
                 <button
                   className="active:opacity-60"
-                  onClick={() => demoNotice("Forgot Username")}
+                  onClick={() => setMode("forgot-username")}
                 >
                   Forgot Username?
                 </button>
                 <button
                   className="active:opacity-60"
-                  onClick={() => demoNotice("Forgot Password")}
+                  onClick={() => setMode("forgot-password")}
                 >
                   Forgot Password?
                 </button>
