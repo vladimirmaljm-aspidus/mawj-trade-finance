@@ -68,7 +68,8 @@ function AppShell() {
           title={status === "authenticated" ? TAB_TITLES[tab] ?? "Mobile Banking" : "Mobile Banking"}
           onMenu={() => setDrawerOpen(true)}
         />
-        <main className="hide-scrollbar relative flex-1 overflow-y-auto">
+        {/* pb-40 keeps content clear of the fixed Install App banner (~120px) */}
+        <main className="hide-scrollbar relative flex-1 overflow-y-auto pb-40">
           {status === "authenticated" ? (
             <ActiveTab />
           ) : (

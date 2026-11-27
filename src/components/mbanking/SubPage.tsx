@@ -34,7 +34,7 @@ export function SubPage({ title, headerRight, children, hideBack, stepIndicator 
         onBack={closeSubPage}
         right={stepIndicator}
       />
-      <div className="hide-scrollbar flex-1 overflow-y-auto">{children}</div>
+      <div className="hide-scrollbar flex-1 overflow-y-auto pb-40">{children}</div>
       <CbiFooter />
     </div>
   );
