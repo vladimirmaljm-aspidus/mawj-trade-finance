@@ -273,7 +273,7 @@ export function PaymentsTab() {
         <button
           type="submit"
           disabled={submitting}
-          className="active-scale mt-2 flex w-full items-center justify-center gap-2 rounded-[1rem] bg-emerald-700 py-4 text-sm font-black text-white shadow-md shadow-slate-900/20 transition-all hover:bg-emerald-800 disabled:opacity-70"
+          className="active-scale mt-2 flex w-full items-center justify-center gap-2 rounded-[1rem] bg-emerald-700 py-4 text-sm font-black text-white shadow-md shadow-blue-700/20 transition-all hover:bg-emerald-800 disabled:opacity-70"
         >
           <ShieldCheck className="h-4 w-4 stroke-[2.5]" />
           {submitting ? "Authorizing…" : "Authorize Transfer"}

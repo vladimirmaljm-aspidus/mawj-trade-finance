@@ -39,7 +39,7 @@ export function ReceivePage() {
         <h3 className="mb-1 text-2xl font-black tracking-tight text-slate-900">
           {companyName}
         </h3>
-        <p className="mb-8 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold uppercase tracking-widest text-emerald-700">
+        <p className="mb-8 rounded-full bg-blue-50 px-3 py-1 text-xs font-bold uppercase tracking-widest text-blue-700">
           {primary?.label ?? "EUR Main Treasury"}
         </p>
 

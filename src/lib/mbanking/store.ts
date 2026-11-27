@@ -205,4 +205,11 @@ export const BANK = {
   tagline: "Corporate Banking · Trade Finance",
   license: "CBI-UAE-1976",
   regulatedBy: "Regulated by the Central Bank of the UAE",
+  // Prave CBI brand boje (preuzete sa njihovog logoa)
+  colors: {
+    primary: "#1B3A5C",    // navy/teal plava (iz logoa)
+    accent: "#C21E56",     // crimson/magenta (iz logoa)
+    teal: "#2E6E9E",       // teal plava
+    navy: "#0a1a2e",       // duboka navy za login
+  },
 };

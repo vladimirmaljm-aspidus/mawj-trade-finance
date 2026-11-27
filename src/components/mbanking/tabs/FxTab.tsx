@@ -61,8 +61,8 @@ export function FxTab() {
         <h2 className="text-[1.3rem] font-black tracking-tight text-slate-900">
           Treasury FX
         </h2>
-        <span className="flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-600 shadow-sm">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+        <span className="flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-blue-700 shadow-sm">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-500" />
           Live Market
         </span>
       </div>
@@ -121,7 +121,7 @@ export function FxTab() {
             </span>
             <button
               onClick={() => setAmount(String(numericAmount))}
-              className="text-[10px] font-black uppercase text-emerald-700"
+              className="text-[10px] font-black uppercase text-blue-700"
             >
               Max
             </button>
@@ -264,7 +264,7 @@ function CurrencyPicker({
               className={cn(
                 "flex items-center justify-between rounded-xl p-4 text-left transition-colors",
                 code === current
-                  ? "bg-emerald-50"
+                  ? "bg-blue-50"
                   : "hover:bg-slate-50"
               )}
             >
@@ -278,7 +278,7 @@ function CurrencyPicker({
                 </div>
               </div>
               {code === current && (
-                <span className="text-xs font-black text-emerald-700">SELECTED</span>
+                <span className="text-xs font-black text-blue-700">SELECTED</span>
               )}
             </button>
           ))}

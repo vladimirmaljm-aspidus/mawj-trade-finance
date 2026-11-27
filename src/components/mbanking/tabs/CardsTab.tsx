@@ -384,7 +384,7 @@ function ToggleSwitch({
       onClick={onChange}
       className={cn(
         "active-scale relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full transition-colors",
-        checked ? "bg-slate-900" : "bg-slate-200"
+        checked ? "bg-blue-700" : "bg-slate-200"
       )}
     >
       <span

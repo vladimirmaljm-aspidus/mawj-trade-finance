@@ -21,20 +21,17 @@ export function Header() {
       <div className="flex items-center justify-between px-5 pt-12 pb-1">
         <div className="flex items-center gap-2.5">
           <img
-            src="/icons/icon-192.png"
+            src="/icons/cbi-logo-full.png"
             alt={BANK.name}
-            className="h-8 w-8 rounded-md shadow-sm ring-1 ring-slate-200"
+            className="h-7 w-auto"
           />
           <div className="flex flex-col leading-none">
-            <span className="text-[15px] font-black tracking-tight text-slate-900">
-              {BANK.shortName}
-            </span>
-            <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-emerald-800">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: "#1B3A5C" }}>
               {BANK.tagline}
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-amber-700">
+        <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest" style={{ color: "#1B3A5C" }}>
           <ShieldCheck className="h-3 w-3" />
           <span className="hidden xs:inline">Secured</span>
         </div>

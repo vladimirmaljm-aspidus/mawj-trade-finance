@@ -86,7 +86,7 @@ function AccountCard({ account }: { account: Account }) {
         <p
           className={cn(
             "relative z-10 mb-5 text-[11px] font-semibold",
-            isPrimary ? "text-amber-300/80" : "text-slate-500"
+            isPrimary ? "text-blue-300/80" : "text-slate-500"
           )}
         >
           ≈ {formatAED(account.balance * 3.9545)}

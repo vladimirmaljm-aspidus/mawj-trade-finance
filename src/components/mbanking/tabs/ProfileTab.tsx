@@ -35,7 +35,7 @@ export function ProfileTab() {
       </h2>
 
       {/* Security score */}
-      <div className="flex items-center justify-between rounded-[1.5rem] bg-gradient-to-r from-emerald-500 to-teal-500 p-5 text-white shadow-lg shadow-emerald-500/20">
+      <div className="flex items-center justify-between rounded-[1.5rem] bg-gradient-to-r from-blue-700 to-blue-900 p-5 text-white shadow-lg shadow-blue-800/20">
         <div>
           <p className="text-lg font-black">Security Score: 100%</p>
           <p className="text-sm font-medium opacity-90">
@@ -192,7 +192,7 @@ function ToggleSwitch({
       onClick={onChange}
       className={cn(
         "active-scale relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full transition-colors",
-        checked ? "bg-slate-900" : "bg-slate-200"
+        checked ? "bg-blue-700" : "bg-slate-200"
       )}
     >
       <span

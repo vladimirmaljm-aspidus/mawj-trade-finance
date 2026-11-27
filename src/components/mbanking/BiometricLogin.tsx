@@ -111,62 +111,58 @@ export function BiometricLogin({ onAuthenticated }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-[200] flex flex-col bg-[#0a1a14] text-white">
-      {/* Subtle top UAE flag strip */}
+    <div className="fixed inset-0 z-[200] flex flex-col" style={{ background: "linear-gradient(180deg, #0a1a2e 0%, #1B3A5C 100%)" }}>
+      {/* UAE flag accent strip — top */}
       <div className="uae-flag-accent absolute left-0 right-0 top-0 h-1" />
 
-      {/* Decorative gold radial in the top-right */}
+      {/* Subtle decorative glow */}
       <div
-        className="pointer-events-none absolute right-[-100px] top-[-80px] h-72 w-72 rounded-full opacity-30"
+        className="pointer-events-none absolute right-[-120px] top-[-100px] h-80 w-80 rounded-full opacity-25"
         style={{
-          background:
-            "radial-gradient(circle, rgba(201,161,74,0.45) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(194,30,86,0.4) 0%, transparent 70%)",
         }}
       />
 
       {/* Content */}
-      <div className="relative z-10 flex h-full flex-col items-center justify-center px-7">
-        {/* Bank logo + wordmark */}
-        <div className="mb-7 flex flex-col items-center">
-          <div className="mb-4 flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/10">
-            <img
-              src="/icons/icon-192.png"
-              alt={BANK.name}
-              className="h-20 w-20"
-            />
-          </div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-amber-400/80">
-            Commercial Bank International
+      <div className="relative z-10 flex h-full flex-col items-center justify-center px-7 text-white">
+        {/* CBI logo (pravi logo, transparentan PNG) */}
+        <div className="mb-8 flex flex-col items-center">
+          <img
+            src="/icons/cbi-logo-full.png"
+            alt="Commercial Bank International"
+            className="h-16 w-auto mb-4 drop-shadow-lg"
+            style={{ filter: "brightness(0) invert(1)" }}
+          />
+          <div className="h-px w-16 bg-white/30 mb-3" />
+          <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-white/70">
+            Corporate Treasury
           </p>
-          <h1 className="mt-1 text-xl font-black tracking-tight">Corporate Treasury</h1>
-          <p className="mt-1 text-[11px] font-medium text-slate-400">
-            Authorized signatory access · DMCC-3184
+          <p className="mt-1 text-[11px] font-medium text-white/50">
+            Authorized signatory access
           </p>
         </div>
 
-        {/* Biometric orb */}
+        {/* Biometric button */}
         <button
           onClick={handleAuthenticate}
           disabled={busy}
-          className="group relative flex h-28 w-28 items-center justify-center rounded-full border border-white/5 bg-gradient-to-br from-white/[0.07] to-white/[0.02] shadow-2xl transition-all hover:from-white/[0.12] disabled:opacity-70"
+          className="group relative flex h-24 w-24 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] shadow-2xl backdrop-blur-sm transition-all hover:bg-white/[0.12] disabled:opacity-70"
           aria-label="Authenticate with biometrics"
         >
-          {/* Gold ring */}
           <span
             className="pointer-events-none absolute inset-0 rounded-full opacity-60"
             style={{
-              boxShadow:
-                "inset 0 0 0 1px rgba(201,161,74,0.25), 0 0 40px rgba(201,161,74,0.15)",
+              boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.15), 0 0 30px rgba(46,110,158,0.3)",
             }}
           />
           {busy ? (
-            <ScanFace className="h-12 w-12 animate-pulse text-amber-400" />
+            <ScanFace className="h-10 w-10 animate-pulse text-white" />
           ) : (
-            <Fingerprint className="h-12 w-12 text-white transition-transform group-hover:scale-105" />
+            <Fingerprint className="h-10 w-10 text-white transition-transform group-hover:scale-105" />
           )}
         </button>
 
-        <p className="mt-6 text-xs font-bold uppercase tracking-[0.3em] text-slate-400">
+        <p className="mt-6 text-xs font-bold uppercase tracking-[0.25em] text-white/60">
           {busy
             ? "Verifying…"
             : supported === false
@@ -187,7 +183,7 @@ export function BiometricLogin({ onAuthenticated }: Props) {
         {/* Passcode */}
         {showPasscode || supported === false ? (
           <div className="mt-7 w-full max-w-xs">
-            <label className="mb-2 block text-center text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">
+            <label className="mb-2 block text-center text-[10px] font-bold uppercase tracking-[0.3em] text-white/60">
               Access code
             </label>
             <input
@@ -196,12 +192,13 @@ export function BiometricLogin({ onAuthenticated }: Props) {
               value={passcode}
               onChange={(e) => setPasscode(e.target.value.replace(/\D/g, "").slice(0, 6))}
               placeholder="• • • • • •"
-              className="w-full rounded-xl border border-white/10 bg-white/[0.04] py-3.5 text-center text-xl font-black tracking-[0.6em] text-white outline-none placeholder:text-slate-700 focus:border-amber-400/40"
+              className="w-full rounded-xl border border-white/10 bg-white/[0.06] py-3.5 text-center text-xl font-black tracking-[0.6em] text-white outline-none placeholder:text-white/30 focus:border-white/30"
             />
             <button
               onClick={handlePasscode}
               disabled={passcode.length !== 6 || busy}
-              className="mt-3 w-full rounded-xl bg-amber-500 py-3.5 text-sm font-black text-slate-900 transition-colors hover:bg-amber-400 disabled:opacity-40"
+              className="mt-3 w-full rounded-xl py-3.5 text-sm font-black transition-colors disabled:opacity-40"
+              style={{ background: "#C21E56", color: "white" }}
             >
               Unlock
             </button>
@@ -209,7 +206,7 @@ export function BiometricLogin({ onAuthenticated }: Props) {
         ) : (
           <button
             onClick={() => setShowPasscode(true)}
-            className="mt-8 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500 transition-colors hover:text-slate-300"
+            className="mt-8 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-white/50 transition-colors hover:text-white/80"
           >
             <Lock className="h-3 w-3" />
             Use access code instead
@@ -219,11 +216,11 @@ export function BiometricLogin({ onAuthenticated }: Props) {
 
         {/* Footer */}
         <div className="absolute bottom-7 flex flex-col items-center gap-1.5">
-          <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.25em] text-emerald-400/60">
+          <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.25em] text-white/40">
             <ShieldCheck className="h-3 w-3" />
             Bank-grade encryption · FIDO2 / WebAuthn
           </div>
-          <p className="text-[9px] font-medium text-slate-600">
+          <p className="text-[9px] font-medium text-white/30">
             {BANK.legalName} · Regulated by the Central Bank of the UAE
           </p>
         </div>
