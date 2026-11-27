@@ -94,4 +94,8 @@ export type SubPageId =
   | "company-details"
   | "support"
   | "security"
-  | "compliance";
+  | "compliance"
+  | "trade-finance"
+  | "trade-instrument"
+  | "financing"
+  | "deposits";

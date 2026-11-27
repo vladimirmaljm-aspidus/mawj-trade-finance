@@ -13,6 +13,9 @@ import {
   Lock,
   Building2,
   LogOut,
+  Ship,
+  Banknote,
+  Vault,
 } from "lucide-react";
 import { CbiLogo, CbiFooter } from "./cbi";
 import { useNav } from "./nav";
@@ -53,6 +56,9 @@ export function CbiDrawer({
     { label: "My Accounts", icon: Landmark, go: goSubPage("accounts") },
     { label: "Transfers", icon: ArrowRightLeft, go: goTab("payments") },
     { label: "Card Services", icon: CreditCard, go: goTab("cards") },
+    { label: "Trade Finance", icon: Ship, go: goSubPage("trade-finance") },
+    { label: "Financing", icon: Banknote, go: goSubPage("financing") },
+    { label: "Deposits & Investments", icon: Vault, go: goSubPage("deposits") },
     { label: "FX Rates", icon: BarChart3, go: goTab("fx") },
     { label: "Compliance", icon: ShieldAlert, go: goSubPage("compliance") },
     { label: "Statements & Tax", icon: FileText, go: goSubPage("taxes") },

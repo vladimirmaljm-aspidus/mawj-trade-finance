@@ -23,6 +23,10 @@ import { CompanyDetailsPage } from "./subpages/CompanyDetailsPage";
 import { SupportPage } from "./subpages/SupportPage";
 import { SecurityPage } from "./subpages/SecurityPage";
 import { CompliancePage } from "./subpages/CompliancePage";
+import { TradeFinancePage } from "./subpages/TradeFinancePage";
+import { TradeInstrumentPage } from "./subpages/TradeInstrumentPage";
+import { FinancingPage } from "./subpages/FinancingPage";
+import { DepositsPage } from "./subpages/DepositsPage";
 import type { TabId } from "@/lib/mbanking/types";
 
 const TAB_TITLES: Record<TabId, string> = {
@@ -133,6 +137,14 @@ function ActiveSubPage() {
       return <SecurityPage />;
     case "compliance":
       return <CompliancePage />;
+    case "trade-finance":
+      return <TradeFinancePage />;
+    case "trade-instrument":
+      return <TradeInstrumentPage />;
+    case "financing":
+      return <FinancingPage />;
+    case "deposits":
+      return <DepositsPage />;
     default:
       return null;
   }

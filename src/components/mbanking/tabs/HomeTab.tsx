@@ -10,6 +10,10 @@ import {
   UserCog,
   ChevronRight,
   Lock,
+  Ship,
+  Banknote,
+  Vault,
+  FileText,
 } from "lucide-react";
 import { useMbanking } from "@/lib/mbanking/store";
 import { useNav } from "../nav";
@@ -114,7 +118,7 @@ export function HomeTab() {
         </CbiAccordionCard>
       </div>
 
-      {/* Main menu — 2×3 grid of hexagon tiles like the real app */}
+      {/* Main menu — 2-col grid of hexagon tiles like the real app */}
       <div className="px-3">
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-2">
           <CbiTile
@@ -135,6 +139,21 @@ export function HomeTab() {
             onClick={() => setTab("cards")}
           />
           <CbiTile
+            label="Trade Finance"
+            icon={<Ship className="h-8 w-8" strokeWidth={1.6} />}
+            onClick={() => openSubPage("trade-finance")}
+          />
+          <CbiTile
+            label="Financing"
+            icon={<Banknote className="h-8 w-8" strokeWidth={1.6} />}
+            onClick={() => openSubPage("financing")}
+          />
+          <CbiTile
+            label="Deposits"
+            icon={<Vault className="h-8 w-8" strokeWidth={1.6} />}
+            onClick={() => openSubPage("deposits")}
+          />
+          <CbiTile
             label="Compliance"
             icon={
               complianceCase ? (
@@ -149,6 +168,11 @@ export function HomeTab() {
             label="FX Rates"
             icon={<BarChart3 className="h-8 w-8" strokeWidth={1.6} />}
             onClick={() => setTab("fx")}
+          />
+          <CbiTile
+            label="Statements & Tax"
+            icon={<FileText className="h-8 w-8" strokeWidth={1.6} />}
+            onClick={() => openSubPage("taxes")}
           />
           <CbiTile
             label="Manage My Account"

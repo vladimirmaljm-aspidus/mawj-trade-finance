@@ -13,6 +13,11 @@ import type {
   TransferMethod,
 } from "./types";
 import type { ComplianceCase } from "./compliance-types";
+import type {
+  Deposit,
+  LoanFacility,
+  TradeInstrument,
+} from "./corporate-types";
 
 interface MbankingState {
   status: AuthStatus;
@@ -26,6 +31,12 @@ interface MbankingState {
   loginEvents: LoginEvent[];
   /** Active compliance case (funds-blocked), if any. */
   complianceCase: ComplianceCase | null;
+  /** Trade finance instruments (LCs, LGs, collections, trust receipts). */
+  tradeInstruments: TradeInstrument[];
+  /** Credit facilities / loans. */
+  facilities: LoanFacility[];
+  /** Term and call deposits. */
+  deposits: Deposit[];
   /** Privacy toggle — hide balance on screen. */
   hideBalance: boolean;
   /** Whether biometric re-auth is required on every launch (in-memory setting). */
@@ -76,6 +87,9 @@ export const useMbanking = create<MbankingState>((set, get) => ({
   fxRates: [],
   loginEvents: [],
   complianceCase: null,
+  tradeInstruments: [],
+  facilities: [],
+  deposits: [],
   hideBalance: false,
   requireBiometrics: true,
   lastError: null,
@@ -97,7 +111,7 @@ export const useMbanking = create<MbankingState>((set, get) => ({
 
   hydrate: async () => {
     try {
-      const [data, compl] = await Promise.all([
+      const [data, compl, corp] = await Promise.all([
         api<{
           profile: Profile;
           accounts: Account[];
@@ -109,6 +123,11 @@ export const useMbanking = create<MbankingState>((set, get) => ({
           balance: number;
         }>(`/api/me?_=${Date.now()}`),
         api<{ case: ComplianceCase | null }>(`/api/compliance?_=${Date.now()}`),
+        api<{
+          tradeInstruments: TradeInstrument[];
+          facilities: LoanFacility[];
+          deposits: Deposit[];
+        }>(`/api/corporate?_=${Date.now()}`),
       ]);
       set({
         status: "authenticated",
@@ -121,6 +140,9 @@ export const useMbanking = create<MbankingState>((set, get) => ({
         loginEvents: data.loginEvents,
         balance: data.balance,
         complianceCase: compl.case,
+        tradeInstruments: corp.tradeInstruments,
+        facilities: corp.facilities,
+        deposits: corp.deposits,
         lastError: null,
       });
     } catch (e) {
@@ -193,6 +215,9 @@ export const useMbanking = create<MbankingState>((set, get) => ({
       fxRates: [],
       loginEvents: [],
       complianceCase: null,
+      tradeInstruments: [],
+      facilities: [],
+      deposits: [],
     });
   },
 }));

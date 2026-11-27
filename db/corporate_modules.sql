@@ -1,0 +1,55 @@
+-- Corporate Banking Modules — applied 2026-11-27
+-- ============================================================
+-- Extends the demo with the corporate banking product set:
+-- Trade Finance (LCs, LGs, collections, trust receipts),
+-- Financing (credit facilities) and Deposits.
+--
+-- Instrument / facility / deposit REFERENCE DATA is served by the
+-- Next.js API layer (GET /api/corporate -> src/lib/mbanking/corporate-data.ts)
+-- so the client store stays fully data-driven. Only the bank-side
+-- fee & interest entries that belong in the ACCOUNT STATEMENT were
+-- inserted into the existing `transactions` table via PostgREST.
+--
+-- Logical rules applied (consistent with funds-blocked case
+-- CBI-CMP-2026-0047 — outgoing transfers suspended since 2026-03-15):
+--   * All instruments/facilities/deposits were granted or placed
+--     BEFORE the block (pre 15 Mar 2026).
+--   * Bank-side charges (facility interest, loan installments, LC/LG
+--     commissions, discounting charges) continue to be debited — the
+--     same legal basis as the account-maintenance charges that
+--     continue while blocked (direct debit under standing agreements).
+--   * Inward credits (call-deposit interest) continue.
+--   * New applications / placements / amendments are suspended in
+--     the UI (ComplianceGate) while the compliance case is open.
+
+-- ---------- inserted statement rows (12, via PostgREST) ----------
+-- AED Operating Account (22222222-0003):
+--   2026-08-10  Bank Guarantee Commission        AED 10,106  REF-MWJ-885108 (LG-PERF-0092)
+--   2026-09-05  Loan Installment — Term Loan      AED 516,493 REF-MWJ-885101 (FAC-TL-2025-04 #10)
+--   2026-10-05  Loan Installment — Term Loan      AED 514,521 REF-MWJ-885402 (FAC-TL-2025-04 #11)
+--   2026-11-05  Loan Installment — Term Loan      AED 512,500 REF-MWJ-885620 (FAC-TL-2025-04 #12)
+--   2026-11-10  Bank Guarantee Commission        AED 10,106  REF-MWJ-885514 (LG-PERF-0092)
+-- EUR Main Treasury (22222222-0001):
+--   2026-09-15  LC Commission — Import            EUR  8,925  REF-MWJ-885212 (LC-IMP-88421)
+--   2026-09-30  Discounting Charge               EUR 12,840  REF-MWJ-885300 (FAC-IDF-002)
+--   2026-10-31  Discounting Charge               EUR 12,840  REF-MWJ-885655 (FAC-IDF-002)
+-- USD Reserve Holding (22222222-0002):
+--   2026-06-30  Working Capital Facility Int.    USD 100,000 REF-MWJ-884700 (FAC-WCF-001)
+--   2026-09-30  Working Capital Facility Int.    USD 100,000 REF-MWJ-885301 (FAC-WCF-001)
+--   2026-10-08  Call Deposit Interest Credit      USD 12,917  REF-MWJ-885410 (CD-2026-0008) [INCOME]
+--   2026-11-08  Call Deposit Interest Credit      USD 12,917  REF-MWJ-885610 (CD-2026-0008) [INCOME]
+
+-- ---------- reference data served from /api/corporate ----------
+-- Trade instruments: LC-IMP-88421 (EUR 4.2M, 58% utilized, final tranche held
+--   pending compliance release), LC-IMP-88376 (USD 2.85M, utilized & closed),
+--   LC-EXP-22014 (EUR 3.15M, payment due 02 Dec — inward, unaffected),
+--   LG-PERF-0092 (AED 7.35M Etihad Rail performance bond, active),
+--   LG-ADV-0031 (AED 3.0M advance payment guarantee, expiring 19 Dec 2026),
+--   DOC-COL-1180 (EUR 1.82M import collection — documents held, payment
+--   suspended), DOC-COL-2201 (EUR 0.94M export collection, accepted),
+--   TR-5521 (USD 1.45M trust receipt, settled pre-block).
+-- Facilities: FAC-WCF-001 revolving USD 12M (outstanding 6.4M),
+--   FAC-TL-2025-04 term loan AED 25M (outstanding 20M, 60 installments),
+--   FAC-IDF-002 invoice discounting EUR 8M (utilisation 3.24M).
+-- Deposits: TD-2026-0117 USD 20M @ 4.45%, TD-2026-0042 EUR 15M @ 3.75%,
+--   CD-2026-0008 USD 5M call @ 3.10% (withdrawals suspended under compliance).
