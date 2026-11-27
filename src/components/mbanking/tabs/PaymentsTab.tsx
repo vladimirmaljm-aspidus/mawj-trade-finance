@@ -1,25 +1,66 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import {
-  ShieldCheck,
-  Check,
-  Plus,
   ArrowRightLeft,
+  Landmark,
+  CreditCard,
+  MapPin,
+  Globe,
+  HeartHandshake,
   Lock,
+  Check,
   ChevronRight,
+  Plus,
 } from "lucide-react";
 import { useMbanking } from "@/lib/mbanking/store";
 import { useNav } from "../nav";
 import { toast } from "@/lib/mbanking/toast";
+import { CbiBackBar, CbiButton, CbiRow, HexagonIcon } from "../cbi";
 import type { TransferMethod } from "@/lib/mbanking/types";
 import { formatCompactEUR, formatEUR } from "@/lib/mbanking/format";
-import { cn } from "@/lib/utils";
 
-const METHODS: { id: TransferMethod; label: string }[] = [
-  { id: "SEPA", label: "SEPA (EUR)" },
-  { id: "SWIFT", label: "SWIFT" },
-  { id: "LOCAL", label: "Local (AED)" },
+const METHOD_LABEL: Record<TransferMethod, string> = {
+  SEPA: "SEPA (EUR)",
+  SWIFT: "SWIFT International",
+  LOCAL: "Local (AED)",
+};
+
+/**
+ * Transfer menu — mirrors the real CBI app's cream transfer-services list.
+ * Each entry maps to one of the demo's underlying transfer methods.
+ */
+const TRANSFER_MENU: { label: string; method: TransferMethod; icon: ReactNode }[] = [
+  {
+    label: "Transfer Within Own Account",
+    method: "LOCAL",
+    icon: <ArrowRightLeft className="h-[18px] w-[18px]" strokeWidth={1.8} />,
+  },
+  {
+    label: "Transfer Within CBI",
+    method: "SEPA",
+    icon: <Landmark className="h-[18px] w-[18px]" strokeWidth={1.8} />,
+  },
+  {
+    label: "Pay CBI Credit Card",
+    method: "LOCAL",
+    icon: <CreditCard className="h-[18px] w-[18px]" strokeWidth={1.8} />,
+  },
+  {
+    label: "Transfer Within UAE",
+    method: "LOCAL",
+    icon: <MapPin className="h-[18px] w-[18px]" strokeWidth={1.8} />,
+  },
+  {
+    label: "International Transfer",
+    method: "SWIFT",
+    icon: <Globe className="h-[18px] w-[18px]" strokeWidth={1.8} />,
+  },
+  {
+    label: "Donation Services",
+    method: "LOCAL",
+    icon: <HeartHandshake className="h-[18px] w-[18px]" strokeWidth={1.8} />,
+  },
 ];
 
 export function PaymentsTab() {
@@ -36,41 +77,39 @@ export function PaymentsTab() {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+  const [view, setView] = useState<"menu" | "form">("menu");
+  const [step, setStep] = useState(1);
 
   // If a compliance case is active, outgoing transfers are blocked.
   if (complianceCase) {
     return (
-      <div className="fade-in flex flex-col gap-4">
-        <h2 className="px-1 text-[1.3rem] font-black tracking-tight text-slate-900">
-          Send Money
-        </h2>
-        <div className="flex flex-col items-center rounded-[1.5rem] border border-amber-300/60 bg-gradient-to-br from-amber-50 to-orange-50 p-8 text-center shadow-sm">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 text-amber-700">
-            <Lock className="h-8 w-8" />
-          </div>
-          <h3 className="text-lg font-black text-slate-900">
-            Transfers suspended
-          </h3>
-          <p className="mt-2 max-w-xs text-xs font-medium leading-relaxed text-slate-600">
-            Outgoing transfers are suspended pending compliance review
-            ({complianceCase.case_reference}). All accounts are restricted
-            until the required documentation is submitted and verified.
-          </p>
-          <div className="mt-4 rounded-xl bg-white px-4 py-2.5 shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-amber-700">
-              Amount held
+      <div className="fade-in cbi-cream flex flex-col gap-3 p-3">
+        <div className="cbi-card overflow-hidden">
+          <div className="h-[18px] w-full bg-[#82134C]" />
+          <div className="flex flex-col items-center px-4 py-6 text-center">
+            <HexagonIcon width={64}>
+              <Lock className="h-7 w-7" strokeWidth={1.6} />
+            </HexagonIcon>
+            <h3 className="mt-3 text-[15px] font-bold text-[#595959]">
+              Transfers Suspended
+            </h3>
+            <p className="mt-2 text-[12px] leading-relaxed text-[#7F7F7F]">
+              Outgoing transfers are suspended pending compliance review
+              ({complianceCase.case_reference}). All accounts are restricted
+              until the required documentation is submitted and verified.
             </p>
-            <p className="mt-0.5 text-base font-black text-slate-900">
-              {formatEUR(complianceCase.amount_blocked)}
-            </p>
+            <div className="mt-4 flex w-full items-baseline justify-between border-b border-[#E0E0E0] pb-1.5">
+              <span className="text-[12px] text-[#7F7F7F]">Amount Held</span>
+              <span className="text-[13px] font-bold text-[#82134C]">
+                {formatEUR(complianceCase.amount_blocked)}
+              </span>
+            </div>
+            <div className="mt-6 w-full">
+              <CbiButton onClick={() => openSubPage("compliance")}>
+                View Compliance Case
+              </CbiButton>
+            </div>
           </div>
-          <button
-            onClick={() => openSubPage("compliance")}
-            className="active-scale mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 py-3.5 text-sm font-black text-white shadow-md transition-colors hover:bg-slate-800"
-          >
-            View compliance case
-            <ChevronRight className="h-4 w-4" />
-          </button>
         </div>
       </div>
     );
@@ -84,6 +123,11 @@ export function PaymentsTab() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (step === 1) {
+      // Step 1 is the details form; native validation gates advancing.
+      setStep(2);
+      return;
+    }
     const amt = parseFloat(amount);
     setSubmitting(true);
     const result = await sendTransfer({
@@ -95,6 +139,7 @@ export function PaymentsTab() {
     setSubmitting(false);
     if (!result.ok) {
       toast(result.reason, "error");
+      setStep(1);
       return;
     }
     setSuccessMsg(
@@ -106,184 +151,223 @@ export function PaymentsTab() {
 
   if (success) {
     return (
-      <div className="fade-in flex h-72 flex-col items-center justify-center rounded-[1.5rem] border border-emerald-200 bg-white px-6 text-center shadow-xl shadow-emerald-100/50">
-        <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full border-4 border-emerald-50 bg-emerald-100 text-emerald-600">
-          <Check className="h-10 w-10 stroke-[3.5]" />
+      <div className="fade-in cbi-cream flex min-h-full flex-col items-center justify-center p-6">
+        <div className="cbi-card w-full max-w-sm px-5 py-8 text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center border border-[#217A3B]/50 text-[#217A3B]">
+            <Check className="h-8 w-8" strokeWidth={2} />
+          </div>
+          <h2 className="mt-4 text-[16px] font-bold text-[#000F32]">
+            Transfer Verified
+          </h2>
+          <p className="mt-2 text-[12px] leading-relaxed text-[#7F7F7F]">
+            {successMsg}
+          </p>
+          <div className="mt-6">
+            <CbiButton
+              onClick={() => {
+                setSuccess(false);
+                setView("menu");
+                setStep(1);
+                setTab("home");
+              }}
+            >
+              Done
+            </CbiButton>
+          </div>
         </div>
-        <h2 className="mb-2 text-2xl font-black tracking-tight text-slate-900">
-          Transfer Verified
-        </h2>
-        <p className="text-sm font-medium text-slate-500">{successMsg}</p>
-        <button
-          onClick={() => {
-            setSuccess(false);
-            setTab("home");
-          }}
-          className="active-scale mt-6 rounded-xl bg-slate-900 px-6 py-3 text-sm font-black text-white shadow-md hover:bg-slate-800"
-        >
-          Done
-        </button>
+      </div>
+    );
+  }
+
+  // Transfer services menu (real CBI app layout).
+  if (view === "menu") {
+    return (
+      <div className="fade-in cbi-cream flex min-h-full flex-col gap-2 p-3">
+        {TRANSFER_MENU.map((m) => (
+          <button
+            key={m.label}
+            onClick={() => {
+              setMethod(m.method);
+              setStep(1);
+              setView("form");
+            }}
+            className="cbi-card flex h-[58px] items-center gap-3 px-3 text-left active:opacity-70"
+          >
+            <HexagonIcon width={48}>{m.icon}</HexagonIcon>
+            <span className="flex-1 text-[13px] font-bold text-[#333333]">
+              {m.label}
+            </span>
+            <ChevronRight className="h-4 w-4 shrink-0 text-[#8C8C8C]" />
+          </button>
+        ))}
       </div>
     );
   }
 
   return (
-    <div className="fade-in flex flex-col gap-6">
-      <h2 className="px-1 text-[1.3rem] font-black tracking-tight text-slate-900">
-        Send Money
-      </h2>
+    <div className="fade-in cbi-cream flex min-h-full flex-col">
+      <CbiBackBar
+        onBack={() => (step === 2 ? setStep(1) : setView("menu"))}
+        right={`Step ${step} of 2`}
+      />
 
-      {/* Method selector */}
-      <div className="flex gap-2 rounded-xl border border-slate-200 bg-slate-200/50 p-1.5">
-        {METHODS.map((m) => (
-          <button
-            key={m.id}
-            onClick={() => setMethod(m.id)}
-            className={cn(
-              "flex-1 rounded-lg py-2 text-xs font-bold transition-colors",
-              method === m.id
-                ? "bg-white text-slate-900 shadow-sm"
-                : "text-slate-500 hover:bg-white/50"
-            )}
-          >
-            {m.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Quick contacts */}
-      <div>
-        <p className="mb-3 px-1 text-[10px] font-black uppercase tracking-widest text-slate-400">
-          Quick Send Contacts
-        </p>
-        <div className="hide-scrollbar flex gap-4 overflow-x-auto px-1 pb-2">
-          {beneficiaries.slice(0, 6).map((c) => (
-            <button
-              key={c.id}
-              onClick={() => {
-                setRecipient(c.full_name);
-                setIban(c.iban || "");
-                setMethod(c.method);
-              }}
-              className="active-scale flex min-w-[4.5rem] flex-col items-center gap-2"
-            >
-              <div
-                className={cn(
-                  "flex h-[3.5rem] w-[3.5rem] items-center justify-center rounded-[1.2rem] text-lg font-black shadow-sm",
-                  c.tone === "indigo" &&
-                    "border border-emerald-100 bg-emerald-50 text-emerald-700",
-                  c.tone === "slate" &&
-                    "border border-slate-800 bg-slate-900 text-white",
-                  c.tone === "amber" &&
-                    "border border-amber-100 bg-amber-50 text-amber-600",
-                  c.tone === "emerald" &&
-                    "border border-emerald-100 bg-emerald-50 text-emerald-600",
-                  c.tone === "blue" &&
-                    "border border-blue-100 bg-blue-50 text-blue-600",
-                  c.tone === "purple" &&
-                    "border border-purple-100 bg-purple-50 text-purple-600"
-                )}
-              >
-                {c.initials}
-              </div>
-              <span className="text-[10px] font-bold text-slate-600">{c.name}</span>
-            </button>
-          ))}
-          <button
-            onClick={() => toast("Add new beneficiary", "info")}
-            className="active-scale flex min-w-[4.5rem] flex-col items-center gap-2"
-          >
-            <div className="flex h-[3.5rem] w-[3.5rem] items-center justify-center rounded-[1.2rem] border border-dashed border-slate-200 bg-slate-100 text-slate-500 shadow-sm">
-              <Plus className="h-5 w-5" />
-            </div>
-            <span className="text-[10px] font-bold text-slate-600">New</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Transfer form */}
-      <form
-        onSubmit={onSubmit}
-        className="relative flex flex-col gap-5 rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-sm"
-      >
-        <div className="absolute right-6 top-5 text-right">
-          <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-            Available
-          </p>
-          <p className="mt-0.5 text-sm font-black text-emerald-600">
-            {formatCompactEUR(balance)}
-          </p>
-        </div>
-
-        <div className="mt-2">
-          <label className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-slate-500">
-            Recipient Name
-          </label>
-          <input
-            type="text"
-            value={recipient}
-            onChange={(e) => setRecipient(e.target.value)}
-            required
-            placeholder="Enter company name"
-            className="w-full rounded-[1rem] border border-slate-200 bg-slate-50 p-3.5 text-sm font-bold text-slate-900 outline-none transition-all placeholder:font-medium placeholder:text-slate-400 focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900"
-          />
-        </div>
-
-        <div>
-          <label className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-slate-500">
-            IBAN / Account
-          </label>
-          <input
-            type="text"
-            value={iban}
-            onChange={(e) => setIban(e.target.value.toUpperCase())}
-            required
-            placeholder="AE89 0330 0044 0532 01"
-            className="w-full rounded-[1rem] border border-slate-200 bg-slate-50 p-3.5 font-mono text-sm font-bold uppercase text-slate-900 outline-none transition-all placeholder:font-medium placeholder:text-slate-400 focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900"
-          />
-        </div>
-
-        <div>
-          <label className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-slate-500">
-            Amount to Send
-          </label>
-          <div className="relative flex items-center">
-            <span className="absolute left-4 text-xl font-black text-slate-900">€</span>
-            <input
-              type="number"
-              inputMode="decimal"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              required
-              min="1"
-              step="0.01"
-              placeholder="0.00"
-              className="w-full rounded-[1rem] border border-slate-200 bg-slate-50 py-4 pl-10 pr-4 text-2xl font-black text-slate-900 outline-none transition-all placeholder:text-slate-300 focus:border-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900"
-            />
+      <form onSubmit={onSubmit} className="flex flex-col gap-3 p-3">
+        <div className="cbi-card px-3 py-3">
+          <div className="flex items-baseline justify-between border-b border-[#E0E0E0] pb-2">
+            <span className="text-[15px] font-bold text-[#595959]">
+              Transfer Details
+            </span>
+            <span className="text-[11px] text-[#7F7F7F]">
+              {METHOD_LABEL[method]}
+            </span>
           </div>
+
+          <div className="pt-1">
+            <CbiRow label="Available Balance" value={formatCompactEUR(balance)} />
+          </div>
+
+          {step === 1 ? (
+            <>
+              {/* Saved beneficiaries */}
+              <div className="mt-2">
+                <p className="mb-2 text-[12px] text-[#7F7F7F]">
+                  Saved Beneficiaries
+                </p>
+                <div className="hide-scrollbar flex gap-2.5 overflow-x-auto pb-1">
+                  {beneficiaries.slice(0, 6).map((c) => (
+                    <button
+                      key={c.id}
+                      onClick={() => {
+                        setRecipient(c.full_name);
+                        setIban(c.iban || "");
+                        setMethod(c.method);
+                      }}
+                      className="active-scale flex w-[88px] shrink-0 flex-col items-center gap-1.5"
+                    >
+                      <span className="flex h-[44px] w-[44px] items-center justify-center border border-[#D9D9D9] bg-white text-[13px] font-bold text-[#7A1F3D]">
+                        {c.initials}
+                      </span>
+                      <span className="w-full truncate text-center text-[10.5px] text-[#595959]">
+                        {c.name}
+                      </span>
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => toast("Add new beneficiary", "info")}
+                    className="active-scale flex w-[88px] shrink-0 flex-col items-center gap-1.5"
+                  >
+                    <span className="flex h-[44px] w-[44px] items-center justify-center border border-dashed border-[#D9D9D9] bg-white text-[#7A1F3D]">
+                      <Plus className="h-5 w-5" strokeWidth={1.8} />
+                    </span>
+                    <span className="text-[10.5px] text-[#595959]">New</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Fields */}
+              <div className="mt-3 flex flex-col gap-4 py-1">
+                <div>
+                  <label
+                    htmlFor="recipient"
+                    className="mb-1.5 block text-[12px] text-[#7F7F7F]"
+                  >
+                    Beneficiary Name
+                  </label>
+                  <input
+                    id="recipient"
+                    type="text"
+                    value={recipient}
+                    onChange={(e) => setRecipient(e.target.value)}
+                    required
+                    placeholder="Enter company name"
+                    className="w-full border-b border-[#E8306E] bg-white pb-2 pt-1 text-[13px] font-bold text-[#222222] outline-none placeholder:font-normal placeholder:text-[#BFBFBF] focus:border-[#82134C]"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="iban"
+                    className="mb-1.5 block text-[12px] text-[#7F7F7F]"
+                  >
+                    IBAN / Account
+                  </label>
+                  <input
+                    id="iban"
+                    type="text"
+                    value={iban}
+                    onChange={(e) => setIban(e.target.value.toUpperCase())}
+                    required
+                    placeholder="AE89 0330 0044 0532 01"
+                    className="w-full border-b border-[#E8306E] bg-white pb-2 pt-1 font-mono text-[13px] font-bold uppercase tracking-[0.06em] text-[#222222] outline-none placeholder:font-normal placeholder:tracking-normal placeholder:text-[#BFBFBF] focus:border-[#82134C]"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="amount"
+                    className="mb-1.5 block text-[12px] text-[#7F7F7F]"
+                  >
+                    Amount to Send
+                  </label>
+                  <div className="flex items-baseline justify-between gap-3 border-b border-[#E8306E] pb-2">
+                    <span className="text-[13px] font-bold text-[#7F7F7F]">
+                      EUR
+                    </span>
+                    <input
+                      id="amount"
+                      type="number"
+                      inputMode="decimal"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      required
+                      min="1"
+                      step="0.01"
+                      placeholder="0.00"
+                      className="min-w-0 flex-1 bg-transparent text-right text-[20px] font-bold text-[#222222] outline-none placeholder:font-normal placeholder:text-[#BFBFBF]"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-[12px] text-[#7F7F7F]">Transfer Fee</span>
+                  <span className="text-[12px] font-bold text-[#217A3B]">
+                    FREE (VIP)
+                  </span>
+                </div>
+              </div>
+            </>
+          ) : (
+            /* Step 2 — review & confirm */
+            <div className="flex flex-col py-1">
+              <CbiRow label="Transfer Type" value={METHOD_LABEL[method]} bold />
+              <CbiRow label="Beneficiary Name" value={recipient || "—"} bold />
+              <CbiRow label="IBAN / Account" value={iban || "—"} />
+              <CbiRow
+                label="Amount to Send"
+                value={formatEUR(parseFloat(amount) || 0)}
+                bold
+              />
+              <CbiRow label="Transfer Fee" value="FREE (VIP)" />
+              <p className="mt-2 text-[11px] leading-relaxed text-[#8C8C8C]">
+                Please verify the beneficiary details before confirming the
+                transfer.
+              </p>
+            </div>
+          )}
         </div>
 
-        <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-3">
-          <span className="text-xs font-bold text-slate-500">Transfer Fee</span>
-          <span className="rounded bg-emerald-100 px-2 py-0.5 text-xs font-black text-emerald-600">
-            FREE (VIP)
-          </span>
-        </div>
+        <CbiButton type="submit" disabled={submitting}>
+          {step === 1 ? "Next" : submitting ? "Processing" : "Confirm Transfer"}
+        </CbiButton>
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="active-scale mt-2 flex w-full items-center justify-center gap-2 rounded-[1rem] bg-emerald-700 py-4 text-sm font-black text-white shadow-md shadow-blue-700/20 transition-all hover:bg-emerald-800 disabled:opacity-70"
-        >
-          <ShieldCheck className="h-4 w-4 stroke-[2.5]" />
-          {submitting ? "Authorizing…" : "Authorize Transfer"}
-        </button>
+        <div className="flex items-center justify-center gap-1.5 py-1 text-[11px] text-[#7F7F7F]">
+          <ArrowRightLeft
+            className="h-3.5 w-3.5 text-[#7A1F3D]"
+            strokeWidth={1.8}
+          />
+          Funds settle instantly for SEPA
+        </div>
       </form>
-
-      <div className="flex items-center justify-center gap-2 px-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-        <ArrowRightLeft className="h-3.5 w-3.5" />
-        Funds settle instantly for SEPA
-      </div>
     </div>
   );
 }

@@ -74,18 +74,18 @@ export function InstallPrompt() {
 
   if (visible && deferred) {
     return (
-      <div className="aspidus-slide-up fixed inset-x-3 bottom-3 z-[90] mx-auto max-w-md rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl">
+      <div className="aspidus-slide-up fixed inset-x-3 bottom-3 z-[90] mx-auto max-w-md border border-[#D9D9D9] bg-white p-3 shadow-lg">
         <div className="flex items-center gap-3">
-          <img src="/icons/icon-192.png" alt="CBI" className="h-11 w-11 shrink-0 rounded-xl shadow-sm ring-1 ring-slate-200" />
+          <img src="/icons/icon-192.png" alt="CBI" className="h-11 w-11 shrink-0 border border-[#D9D9D9]" />
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-black text-slate-900">Install CBI</p>
-            <p className="truncate text-xs font-medium text-slate-500">
+            <p className="text-[13px] font-bold text-[#595959]">Install CBI Mobile Banking</p>
+            <p className="truncate text-[11.5px] text-[#7F7F7F]">
               Add to your home screen for a native app experience.
             </p>
           </div>
           <button
             onClick={dismiss}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100"
+            className="flex h-8 w-8 items-center justify-center text-[#8C8C8C] active:opacity-60"
             aria-label="Dismiss"
           >
             <X className="h-4 w-4" />
@@ -93,7 +93,7 @@ export function InstallPrompt() {
         </div>
         <button
           onClick={install}
-          className="active-scale mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 py-3 text-sm font-black text-white shadow-md transition-colors hover:bg-emerald-800"
+          className="cbi-btn-blue mt-3 flex w-full items-center justify-center gap-2 py-3 text-[13px] font-bold uppercase tracking-[0.12em] text-white shadow-[0_1px_3px_rgba(0,0,0,0.25)] active:opacity-80"
         >
           <Download className="h-4 w-4" />
           Install App
@@ -119,18 +119,18 @@ export function InstallPrompt() {
 
   if (iosHint) {
     return (
-      <div className="aspidus-slide-up fixed inset-x-3 bottom-3 z-[90] mx-auto max-w-md rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl">
+      <div className="aspidus-slide-up fixed inset-x-3 bottom-3 z-[90] mx-auto max-w-md border border-[#D9D9D9] bg-white p-3 shadow-lg">
         <div className="flex items-start gap-3">
-          <img src="/icons/icon-192.png" alt="CBI" className="h-11 w-11 shrink-0 rounded-xl shadow-sm ring-1 ring-slate-200" />
+          <img src="/icons/icon-192.png" alt="CBI" className="h-11 w-11 shrink-0 border border-[#D9D9D9]" />
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-black text-slate-900">Install CBI</p>
-            <p className="text-xs font-medium text-slate-500">
+            <p className="text-[13px] font-bold text-[#595959]">Install CBI Mobile Banking</p>
+            <p className="text-[11.5px] text-[#7F7F7F]">
               Tap{" "}
-              <span className="font-black text-slate-900">
+              <span className="font-bold text-[#000F32]">
                 Share
               </span>{" "}
               then{" "}
-              <span className="font-black text-slate-900">
+              <span className="font-bold text-[#000F32]">
                 Add to Home Screen
               </span>{" "}
               to install.
@@ -138,7 +138,7 @@ export function InstallPrompt() {
           </div>
           <button
             onClick={dismiss}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100"
+            className="flex h-8 w-8 shrink-0 items-center justify-center text-[#8C8C8C] active:opacity-60"
             aria-label="Dismiss"
           >
             <X className="h-4 w-4" />

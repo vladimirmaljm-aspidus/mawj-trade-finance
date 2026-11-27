@@ -1,56 +1,41 @@
 "use client";
 
 import { type ReactNode } from "react";
-import { ArrowLeft } from "lucide-react";
+import { CbiHeader, CbiBackBar, CbiFooter } from "./cbi";
 import { useNav } from "./nav";
 
 interface SubPageProps {
   title: string;
-  /** Optional right-side action rendered in the header. */
+  /** Optional right-side action rendered in the header bar. */
   headerRight?: ReactNode;
   children: ReactNode;
   /** Hide the default back button (e.g. when a custom one is needed). */
   hideBack?: boolean;
+  /** Right-side text in the navy back bar (e.g. "Step 1 of 3"). */
+  stepIndicator?: string;
 }
 
 /**
- * Full-screen overlay sub-page that slides in from the right.
- * Renders a sticky header with a back button + the page title.
+ * Full-screen overlay sub-page — authentic CBI layout:
+ * gradient header (pennant + right-aligned title) → navy Back bar →
+ * flat body → gradient copyright footer.
  */
-export function SubPage({ title, headerRight, children, hideBack }: SubPageProps) {
+export function SubPage({ title, headerRight, children, hideBack, stepIndicator }: SubPageProps) {
   const { closeSubPage } = useNav();
 
   return (
-    <div className="aspidus-subpage fixed inset-0 z-50 flex flex-col bg-[#f8fafc]">
-      <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-slate-200 bg-[#f8fafc] px-5 pb-3 pt-12">
-        {!hideBack && (
-          <button
-            onClick={closeSubPage}
-            className="active-scale flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-900 shadow-sm hover:bg-slate-50"
-            aria-label="Go back"
-          >
-            <ArrowLeft className="h-5 w-5 stroke-[2.5]" />
-          </button>
-        )}
-        <h1 className="ml-1 text-xl font-black tracking-tight text-slate-900">
-          {title}
-        </h1>
-        {headerRight && <div className="ml-auto flex items-center">{headerRight}</div>}
-      </header>
+    <div className="cbi-slide-in fixed inset-0 z-50 flex flex-col bg-[#F7F7F7]">
+      <CbiHeader
+        title={title}
+        onBack={hideBack ? undefined : closeSubPage}
+        right={headerRight}
+      />
+      <CbiBackBar
+        onBack={closeSubPage}
+        right={stepIndicator}
+      />
       <div className="hide-scrollbar flex-1 overflow-y-auto">{children}</div>
-      <style jsx>{`
-        .aspidus-subpage {
-          animation: aspidus-slide-in 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        @keyframes aspidus-slide-in {
-          from {
-            transform: translateX(100%);
-          }
-          to {
-            transform: translateX(0);
-          }
-        }
-      `}</style>
+      <CbiFooter />
     </div>
   );
 }

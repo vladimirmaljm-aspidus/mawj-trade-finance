@@ -1,36 +1,33 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Ubuntu } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ServiceWorkerRegister } from "@/components/mbanking/ServiceWorkerRegister";
 
-const inter = Inter({
-  variable: "--font-inter",
+const ubuntu = Ubuntu({
+  variable: "--font-ubuntu",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  weight: ["300", "400", "500", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "Commercial Bank International — Corporate Treasury",
+  title: "CBI Mobile Banking",
   description:
-    "Corporate banking & trade finance for authorized signatories. Liquidity, letters of credit, FX and cross-border payments.",
+    "CBI Mobile Banking — corporate banking & trade finance for authorized signatories. Manage liquidity, transfers, FX and cross-border payments.",
   keywords: [
     "Commercial Bank International",
     "CBI",
+    "mobile banking",
     "trade finance",
     "corporate treasury",
-    "letter of credit",
-    "SEPA",
-    "SWIFT",
     "UAE",
     "Dubai",
   ],
-  authors: [{ name: "Commercial Bank International PJSC" }],
   applicationName: "CBI",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
     title: "CBI",
   },
   formatDetection: { telephone: false, email: false, address: false },
@@ -45,7 +42,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1B3A5C",
+  themeColor: "#000F32",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -61,14 +58,11 @@ export default function RootLayout({
       <head>
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta
-          name="apple-mobile-web-app-status-bar-style"
-          content="black-translucent"
-        />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="CBI" />
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
       </head>
-      <body className={`${inter.variable} antialiased bg-background text-foreground`}>
+      <body className={`${ubuntu.variable} antialiased bg-background text-foreground`}>
         {children}
         <Toaster />
         <ServiceWorkerRegister />

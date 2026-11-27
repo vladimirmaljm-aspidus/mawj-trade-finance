@@ -1,269 +1,167 @@
 "use client";
 
+import { useState } from "react";
 import {
-  Eye,
-  EyeOff,
-  ArrowDownToLine,
-  Send,
   Landmark,
+  ArrowRightLeft,
   CreditCard,
-  BarChart2,
-  FileCheck2,
+  ShieldAlert,
+  BarChart3,
+  UserCog,
   ChevronRight,
   Lock,
 } from "lucide-react";
 import { useMbanking } from "@/lib/mbanking/store";
-import { formatBalanceParts, formatEUR, formatAedEquivalent } from "@/lib/mbanking/format";
 import { useNav } from "../nav";
+import {
+  CbiAccordionCard,
+  CbiAccountRow,
+  CbiRow,
+  CbiTile,
+} from "../cbi";
 import { TransactionItem } from "../ui/TransactionItem";
 import { ComplianceBanner } from "../ComplianceBanner";
-import { toast } from "@/lib/mbanking/toast";
-import { cn } from "@/lib/utils";
+
+/** Indicative AED equivalent for one account using live fx rates. */
+function aedEquivalent(amount: number, currency: string, rates: { base: string; quote: string; rate: number }[]): number {
+  if (currency === "AED") return amount;
+  const r = rates.find((x) => x.base === currency && x.quote === "AED")?.rate;
+  if (r) return amount * r;
+  if (currency === "EUR") return amount * 3.9545;
+  if (currency === "USD") return amount * 3.6725;
+  return amount;
+}
+
+function fmt(amount: number, currency: string): string {
+  return new Intl.NumberFormat("en-AE", {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
+  }).format(amount) + (currency === "AED" ? "" : "");
+}
 
 export function HomeTab() {
-  const balance = useMbanking((s) => s.balance);
+  const accounts = useMbanking((s) => s.accounts);
   const transactions = useMbanking((s) => s.transactions);
-  const hideBalance = useMbanking((s) => s.hideBalance);
-  const setHideBalance = useMbanking((s) => s.setHideBalance);
   const complianceCase = useMbanking((s) => s.complianceCase);
   const fxRates = useMbanking((s) => s.fxRates);
   const { openSubPage, setTab } = useNav();
+  const [open, setOpen] = useState(true);
 
-  const { whole, cents } = formatBalanceParts(balance);
   const recent = transactions.slice(0, 5);
 
-  // EUR → AED rate from live fxRates (fallback 3.9545 if not loaded).
-  const eurAedRate =
-    fxRates.find((r) => r.base === "EUR" && r.quote === "AED")?.rate ?? 3.9545;
-
-  // Monthly spending: only Settled expenses (exclude Rejected + Processing/blocked).
-  // Restricted to EUR treasury account so the figure is meaningful for the card.
-  const monthExpenses = transactions
-    .filter(
-      (t) =>
-        t.type === "expense" &&
-        t.status === "Settled" &&
-        t.currency === "EUR"
-    )
-    .reduce((sum, t) => sum + t.amount, 0);
-  const monthlyLimit = 10_000_000;
-  const spentPct = Math.min(100, Math.round((monthExpenses / monthlyLimit) * 100));
+  // Total indicative AED equivalent across all accounts.
+  const totalAed = accounts.reduce(
+    (sum, a) => sum + aedEquivalent(a.balance, a.currency, fxRates),
+    0
+  );
 
   return (
-    <div className="fade-in flex flex-col gap-6">
-      {/* Compliance banner (if active case) */}
+    <div className="flex flex-col gap-3 pb-4">
+      {/* Compliance notice — CBI flat card with magenta ribbon */}
       {complianceCase && <ComplianceBanner caseRow={complianceCase} />}
 
-      {/* Balance card */}
-      <div className="premium-navy-card relative overflow-hidden rounded-[2rem] p-7 text-white shadow-2xl">
-        {/* UAE flag accent strip — top of balance card */}
-        <div className="uae-flag-accent absolute left-0 right-0 top-0 h-1 opacity-80" />
-        {/* Restricted overlay badge when compliance case is active */}
-        {complianceCase && (
-          <div className="absolute right-5 top-5 z-20 flex items-center gap-1.5 rounded-full border border-amber-400/30 bg-amber-500/20 px-2.5 py-1 backdrop-blur-sm">
-            <Lock className="h-3 w-3 text-amber-300" />
-            <span className="text-[9px] font-black uppercase tracking-widest text-amber-200">
-              Restricted
-            </span>
-          </div>
-        )}
-        <div className="relative z-10 mb-6 flex items-start justify-between">
-          <div>
-            <div className="mb-2 flex items-center gap-2">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-300">
-                Total Liquidity (EUR)
-              </p>
-              <button
-                onClick={() => setHideBalance(!hideBalance)}
-                className="text-slate-400 transition-colors hover:text-white"
-                aria-label={hideBalance ? "Show balance" : "Hide balance"}
-              >
-                {hideBalance ? (
-                  <EyeOff className="h-3.5 w-3.5" />
-                ) : (
-                  <Eye className="h-3.5 w-3.5" />
-                )}
-              </button>
-            </div>
-            {hideBalance ? (
-              <h1 className="text-[2.5rem] font-black leading-none tracking-tighter drop-shadow-md">
-                ••••••••
-              </h1>
-            ) : (
-              <>
-                <h1 className="text-[2.5rem] font-black leading-none tracking-tighter text-white drop-shadow-md">
-                  €{whole}.<span className="text-2xl font-bold text-slate-400">{cents}</span>
-                </h1>
-                <p className="mt-2 text-[11px] font-semibold text-slate-400">
-                  {formatAedEquivalent(balance, eurAedRate)}
-                </p>
-              </>
-            )}
-          </div>
-        </div>
+      {/* Account Summary accordion — like the real CBI dashboard */}
+      <div className="px-3 pt-3">
+        <CbiAccordionCard
+          title="Current Accounts"
+          open={open}
+          onToggle={() => setOpen((v) => !v)}
+          summaryLabel="Indicative AED Equivalent"
+          summaryValue={`AED ${fmt(totalAed, "AED")}`}
+        >
+          {accounts.map((acc) => (
+            <CbiAccountRow
+              key={acc.id}
+              accountNumber={acc.iban.replace(/\s/g, "")}
+              onClick={() => openSubPage("accounts")}
+            >
+              <p className="pb-0.5 text-[11px] text-[#7F7F7F]">{acc.label}</p>
+              <CbiRow
+                label="Available Bal."
+                value={fmt(acc.balance, acc.currency)}
+                currency={acc.currency}
+              />
+              <CbiRow
+                label="Indicative AED Equivalent"
+                value={fmt(aedEquivalent(acc.balance, acc.currency, fxRates), "AED")}
+                currency="AED"
+              />
+            </CbiAccountRow>
+          ))}
+          {accounts.length === 0 && (
+            <p className="py-3 text-center text-[12px] text-[#9E9E9E]">
+              No accounts available
+            </p>
+          )}
+        </CbiAccordionCard>
+      </div>
 
-        <div className="relative z-10 mb-6 flex items-center justify-between rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur-md">
-          <div>
-            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-300">
-              Yield Earned YTD
-            </p>
-            <p className="mt-0.5 text-sm font-bold text-emerald-400">
-              +€452,100.00 (4.2% APY)
-            </p>
-          </div>
-          <div className="h-8 w-[1px] bg-white/20" />
-          <div className="text-right">
-            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-300">
-              Pending Clearing
-            </p>
-            <p className="mt-0.5 text-sm font-bold text-amber-400">€1,200,000.00</p>
-          </div>
-        </div>
-
-        <div className="relative z-10 flex gap-3">
-          <button
-            onClick={() => openSubPage("receive")}
-            className="active-scale flex flex-1 items-center justify-center gap-2 rounded-[1rem] bg-white py-3.5 text-[13px] font-black text-slate-900 shadow-lg transition-colors hover:bg-slate-100"
-          >
-            <ArrowDownToLine className="h-4 w-4 stroke-[2.5]" />
-            Add Funds
-          </button>
-          <button
+      {/* Main menu — 2×3 grid of hexagon tiles like the real app */}
+      <div className="px-3">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-2">
+          <CbiTile
+            label="My Accounts"
+            icon={<Landmark className="h-8 w-8" strokeWidth={1.6} />}
+            onClick={() => openSubPage("accounts")}
+          />
+          <CbiTile
+            label="Transfers"
+            icon={<ArrowRightLeft className="h-8 w-8" strokeWidth={1.6} />}
             onClick={() =>
-              complianceCase
-                ? openSubPage("compliance")
-                : setTab("payments")
+              complianceCase ? openSubPage("compliance") : setTab("payments")
             }
-            className={cn(
-              "active-scale flex flex-1 items-center justify-center gap-2 rounded-[1rem] border py-3.5 text-[13px] font-black backdrop-blur-md transition-colors",
-              complianceCase
-                ? "cursor-not-allowed border-amber-400/30 bg-amber-500/10 text-amber-200 hover:bg-amber-500/20"
-                : "border-amber-400/30 bg-amber-500/20 text-white hover:bg-amber-500/30"
-            )}
-          >
-            {complianceCase ? (
-              <Lock className="h-4 w-4" />
-            ) : (
-              <Send className="h-4 w-4 stroke-[2.5]" />
-            )}
-            {complianceCase ? "Blocked" : "Send Money"}
-          </button>
-        </div>
-      </div>
-
-      {/* Quick actions */}
-      <div className="mt-1 grid grid-cols-4 gap-3">
-        <QuickAction
-          label="Accounts"
-          icon={<Landmark className="h-5 w-5 stroke-[2]" />}
-          tone="blue"
-          onClick={() => openSubPage("accounts")}
-        />
-        <QuickAction
-          label="Cards"
-          icon={<CreditCard className="h-5 w-5 stroke-[2]" />}
-          tone="purple"
-          onClick={() => setTab("cards")}
-        />
-        <QuickAction
-          label="Insights"
-          icon={<BarChart2 className="h-5 w-5 stroke-[2]" />}
-          tone="emerald"
-          onClick={() => openSubPage("analytics")}
-        />
-        <QuickAction
-          label="Taxes"
-          icon={<FileCheck2 className="h-5 w-5 stroke-[2]" />}
-          tone="amber"
-          onClick={() => openSubPage("taxes")}
-        />
-      </div>
-
-      {/* Monthly spending */}
-      <button
-        onClick={() => openSubPage("analytics")}
-        className="active-scale rounded-[1.5rem] border border-slate-200 bg-white p-5 text-left shadow-sm transition-colors hover:border-slate-400"
-      >
-        <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-slate-900">Monthly Spending</h3>
-          <ChevronRight className="h-4 w-4 text-slate-400" />
-        </div>
-        <div className="flex items-end gap-3">
-          <p className="text-2xl font-black tracking-tight text-rose-600">
-            {formatEUR(monthExpenses)}
-          </p>
-          <p className="mb-1 text-xs font-bold text-slate-500">
-            of {formatEUR(monthlyLimit)} Limit
-          </p>
-        </div>
-        <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
-          <div
-            className="h-full rounded-full bg-rose-500 transition-all"
-            style={{ width: `${spentPct}%` }}
+          />
+          <CbiTile
+            label="Cards"
+            icon={<CreditCard className="h-8 w-8" strokeWidth={1.6} />}
+            onClick={() => setTab("cards")}
+          />
+          <CbiTile
+            label="Compliance"
+            icon={
+              complianceCase ? (
+                <Lock className="h-8 w-8" strokeWidth={1.6} />
+              ) : (
+                <ShieldAlert className="h-8 w-8" strokeWidth={1.6} />
+              )
+            }
+            onClick={() => openSubPage("compliance")}
+          />
+          <CbiTile
+            label="FX Rates"
+            icon={<BarChart3 className="h-8 w-8" strokeWidth={1.6} />}
+            onClick={() => setTab("fx")}
+          />
+          <CbiTile
+            label="Manage My Account"
+            icon={<UserCog className="h-8 w-8" strokeWidth={1.6} />}
+            onClick={() => setTab("profile")}
           />
         </div>
-      </button>
+      </div>
 
-      {/* Recent activity */}
-      <div className="mt-2">
-        <div className="mb-3 flex items-center justify-between px-1">
-          <h2 className="text-[1.1rem] font-black tracking-tight text-slate-900">
-            Recent Activity
-          </h2>
+      {/* Recent transactions — flat list card */}
+      <div className="px-3">
+        <div className="flex items-center justify-between px-1 pb-1.5">
+          <h2 className="text-[15px] font-bold text-[#595959]">Recent Transactions</h2>
           <button
             onClick={() => openSubPage("all-transactions")}
-            className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-700 transition-colors hover:text-slate-900"
+            className="flex items-center gap-0.5 text-[12px] text-[#1565C0] active:opacity-60"
           >
             View All
+            <ChevronRight className="h-3.5 w-3.5" />
           </button>
         </div>
-        <div className="flex flex-col rounded-[1.5rem] border border-slate-200 bg-white p-2 shadow-sm">
+        <div className="cbi-card">
           {recent.length === 0 ? (
-            <p className="py-8 text-center text-xs font-bold text-slate-400">
-              No activity yet
+            <p className="py-8 text-center text-[12px] text-[#9E9E9E]">
+              No recent activity
             </p>
           ) : (
-            recent.map((tx) => <TransactionItem key={tx.id} tx={tx} compact />)
+            recent.map((tx) => <TransactionItem key={tx.id} tx={tx} />)
           )}
         </div>
       </div>
     </div>
-  );
-}
-
-const TONE_MAP = {
-  blue: { ring: "group-hover:border-blue-400", bg: "bg-blue-50", text: "text-blue-600" },
-  purple: { ring: "group-hover:border-purple-400", bg: "bg-purple-50", text: "text-purple-600" },
-  emerald: { ring: "group-hover:border-emerald-400", bg: "bg-emerald-50", text: "text-emerald-600" },
-  amber: { ring: "group-hover:border-amber-400", bg: "bg-amber-50", text: "text-amber-600" },
-} as const;
-
-function QuickAction({
-  label,
-  icon,
-  tone,
-  onClick,
-}: {
-  label: string;
-  icon: React.ReactNode;
-  tone: keyof typeof TONE_MAP;
-  onClick: () => void;
-}) {
-  const t = TONE_MAP[tone];
-  return (
-    <button onClick={onClick} className="active-scale group flex flex-col items-center gap-2">
-      <div
-        className={`flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-[1.2rem] border border-slate-200 bg-white shadow-sm transition-all ${t.ring}`}
-      >
-        <div
-          className={`flex h-10 w-10 items-center justify-center rounded-full ${t.bg} ${t.text}`}
-        >
-          {icon}
-        </div>
-      </div>
-      <span className="text-[10px] font-bold uppercase tracking-wide text-slate-600">
-        {label}
-      </span>
-    </button>
   );
 }

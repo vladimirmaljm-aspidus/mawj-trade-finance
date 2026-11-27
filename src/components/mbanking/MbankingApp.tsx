@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { NavProvider, useNav } from "./nav";
-import { useMbanking, BANK } from "@/lib/mbanking/store";
-import { Header } from "./Header";
-import { TopNav } from "./TopNav";
+import { useMbanking } from "@/lib/mbanking/store";
+import { CbiHeader, CbiFooter, CbiLogo } from "./cbi";
+import { CbiDrawer } from "./CbiDrawer";
 import { BiometricLogin } from "./BiometricLogin";
 import { AspidusToaster } from "./AspidusToaster";
 import { InstallPrompt } from "./InstallPrompt";
@@ -25,6 +25,14 @@ import { SecurityPage } from "./subpages/SecurityPage";
 import { CompliancePage } from "./subpages/CompliancePage";
 import type { TabId } from "@/lib/mbanking/types";
 
+const TAB_TITLES: Record<TabId, string> = {
+  home: "Account Summary",
+  cards: "Card Services",
+  payments: "Transfers",
+  fx: "FX Rates",
+  profile: "Manage My Account",
+};
+
 export function MbankingApp() {
   return (
     <NavProvider>
@@ -37,6 +45,8 @@ function AppShell() {
   const status = useMbanking((s) => s.status);
   const checkSession = useMbanking((s) => s.checkSession);
   const hydrate = useMbanking((s) => s.hydrate);
+  const tab = useNav((n) => n.tab);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   // On first mount, check whether a valid session cookie already exists.
   useEffect(() => {
@@ -53,18 +63,23 @@ function AppShell() {
 
   return (
     <>
-      <div className="app-bg relative mx-auto flex min-h-screen w-full max-w-md flex-col overflow-x-hidden border-slate-300 shadow-[0_0_50px_rgba(0,0,0,0.3)] sm:border-x">
-        <Header />
-        <TopNav />
-        <main className="hide-scrollbar relative flex-1 overflow-y-auto px-5 pb-12 pt-5">
+      <div className="app-bg relative mx-auto flex min-h-screen w-full max-w-md flex-col overflow-x-hidden bg-[#F7F7F7] shadow-[0_0_30px_rgba(0,0,0,0.18)]">
+        <CbiHeader
+          title={status === "authenticated" ? TAB_TITLES[tab] ?? "Mobile Banking" : "Mobile Banking"}
+          onMenu={() => setDrawerOpen(true)}
+        />
+        <main className="hide-scrollbar relative flex-1 overflow-y-auto">
           {status === "authenticated" ? (
             <ActiveTab />
           ) : (
             <DashboardSkeleton />
           )}
         </main>
+        <CbiFooter />
       </div>
+
       {/* Overlays rendered outside the overflow container. */}
+      <CbiDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
       <ActiveSubPage />
       {status !== "authenticated" && status !== "loading" && (
         <BiometricLogin onAuthenticated={() => hydrate()} />
@@ -124,17 +139,13 @@ function ActiveSubPage() {
 
 function SplashScreen() {
   return (
-    <div
-      className="premium-navy-card fixed inset-0 z-[200] flex flex-col items-center justify-center text-white"
-      style={{ backgroundColor: "#0B3D2E" }}
-    >
-      <div className="relative z-10 flex flex-col items-center">
-        <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-[1rem] border border-amber-500/20 bg-white/[0.03]">
-          <img src="/icons/icon-192.png" alt={BANK.name} className="h-16 w-16 rounded-[1rem]" />
+    <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-white">
+      <div className="flex flex-col items-center">
+        <CbiLogo height={44} />
+        <p className="mt-4 text-[13px] tracking-[0.1em] text-[#7F7F7F]">MOBILE BANKING</p>
+        <div className="mt-6 h-[3px] w-[120px] overflow-hidden bg-[#E5E5E5]">
+          <div className="cbi-footer-gradient h-full w-1/2 animate-pulse" />
         </div>
-        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-amber-400/80">
-          {BANK.tagline}
-        </p>
       </div>
     </div>
   );
@@ -142,15 +153,14 @@ function SplashScreen() {
 
 function DashboardSkeleton() {
   return (
-    <div className="fade-in flex flex-col gap-6">
-      <div className="premium-navy-card h-56 rounded-[2rem]" />
-      <div className="grid grid-cols-4 gap-3">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-20 rounded-[1.2rem] bg-slate-100" />
+    <div className="flex flex-col gap-3 p-3">
+      <div className="cbi-card h-[180px]" />
+      <div className="grid grid-cols-2 gap-2">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="cbi-card h-[110px]" />
         ))}
       </div>
-      <div className="h-24 rounded-[1.5rem] bg-slate-100" />
-      <div className="h-64 rounded-[1.5rem] bg-slate-100" />
+      <div className="cbi-card h-[140px]" />
     </div>
   );
 }

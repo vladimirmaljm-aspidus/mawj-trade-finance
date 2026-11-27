@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, FileText } from "lucide-react";
+import { Download, FileText, ChevronRight } from "lucide-react";
 import { SubPage } from "../SubPage";
 import { toast } from "@/lib/mbanking/toast";
 
@@ -42,43 +42,43 @@ const STATEMENTS = [
 export function TaxesPage() {
   return (
     <SubPage title="Tax Records">
-      <div className="flex flex-col gap-4 p-5 pt-6">
-        {/* Tax records */}
-        <div className="flex flex-col gap-3">
+      <div className="px-3 py-3">
+        {/* Tax records — label left, amount/status right */}
+        <div className="cbi-card">
           {TAX_RECORDS.map((r) => (
             <div
               key={r.title}
-              className="flex items-center justify-between rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-sm"
+              className="flex items-center justify-between border-b border-[#E5E5E5] px-3 py-3 last:border-b-0"
             >
               <div>
-                <p className="text-sm font-black text-slate-900">{r.title}</p>
-                <p className="mt-1 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  {r.period} · {r.amount}
-                </p>
+                <p className="text-[13px] font-bold text-[#595959]">{r.title}</p>
+                <p className="mt-0.5 text-[11px] text-[#7F7F7F]">{r.period}</p>
               </div>
-              <StatusBadge status={r.status} />
+              <div className="text-right">
+                <p className="text-[13px] font-bold text-[#222222]">{r.amount}</p>
+                <StatusBadge status={r.status} />
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Statements */}
-        <div className="rounded-[1.5rem] border border-slate-200 bg-white p-2 shadow-sm">
-          <div className="flex items-center gap-2 px-3 py-3">
-            <FileText className="h-4 w-4 text-slate-400" />
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-              Monthly Statements
-            </p>
+        {/* Statements — white rows with chevrons */}
+        <div className="mt-3 cbi-card">
+          <div className="flex items-center gap-1.5 border-b border-[#E5E5E5] px-3 py-2.5">
+            <FileText className="h-4 w-4 text-[#7A1F3D]" strokeWidth={1.8} />
+            <p className="text-[15px] font-bold text-[#595959]">Monthly Statements</p>
           </div>
           {STATEMENTS.map((s) => (
             <button
               key={s}
               onClick={() => toast(`Downloading ${s}…`, "info")}
-              className="active-scale flex w-full items-center justify-between border-b border-slate-50 p-4 text-left transition-colors last:border-0 hover:bg-slate-50"
+              className="flex w-full items-center justify-between border-b border-[#E5E5E5] px-3 py-3 text-left last:border-b-0 active:opacity-70"
             >
-              <span className="text-sm font-black text-slate-900">{s}</span>
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
-                <Download className="h-4 w-4 stroke-[2.5]" />
+              <span className="flex items-center gap-2">
+                <Download className="h-4 w-4 text-[#7A1F3D]" strokeWidth={1.8} />
+                <span className="text-[13px] font-bold text-[#595959]">{s}</span>
               </span>
+              <ChevronRight className="h-4 w-4 text-[#8C8C8C]" />
             </button>
           ))}
         </div>
@@ -88,21 +88,11 @@ export function TaxesPage() {
 }
 
 function StatusBadge({ status }: { status: TaxRecord["status"] }) {
-  if (status === "Filed")
-    return (
-      <span className="rounded-lg border border-emerald-200 bg-emerald-100 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-emerald-700">
-        Filed
-      </span>
-    );
-  if (status === "Overdue")
-    return (
-      <span className="rounded-lg border border-rose-200 bg-rose-100 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-rose-700">
-        Overdue
-      </span>
-    );
+  const color =
+    status === "Filed" ? "text-[#217A3B]" : "text-[#82134C]";
   return (
-    <span className="rounded-lg border border-amber-200 bg-amber-100 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-amber-700">
-      Pending
+    <span className={`mt-0.5 block text-[11px] font-bold uppercase ${color}`}>
+      {status}
     </span>
   );
 }

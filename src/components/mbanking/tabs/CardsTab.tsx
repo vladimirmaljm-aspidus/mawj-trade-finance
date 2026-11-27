@@ -19,6 +19,7 @@ import { toast } from "@/lib/mbanking/toast";
 import { cn } from "@/lib/utils";
 import { formatEUR } from "@/lib/mbanking/format";
 import { SpendingLimitsModal } from "../SpendingLimitsModal";
+import { CbiLogo, CbiSectionTitle, HexagonIcon } from "../cbi";
 import type { CardInfo } from "@/lib/mbanking/types";
 
 export function CardsTab() {
@@ -45,112 +46,124 @@ export function CardsTab() {
   };
 
   return (
-    <div className="fade-in flex flex-col gap-6">
-      <div className="flex items-center justify-between px-1">
-        <h2 className="text-[1.3rem] font-black tracking-tight text-slate-900">
-          Corporate Cards
-        </h2>
+    <div className="fade-in flex flex-col gap-3 p-3 pb-5">
+      <div className="flex items-center justify-between">
+        <CbiSectionTitle>Corporate Cards</CbiSectionTitle>
         <button
           onClick={() => toast("Card issuance request sent", "info")}
-          className="active-scale flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm"
+          className="cbi-card flex h-9 w-9 shrink-0 items-center justify-center active:opacity-70"
           aria-label="Add card"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-4 w-4 text-[#7A1F3D]" strokeWidth={1.8} />
         </button>
       </div>
 
-      {/* Physical metal card */}
+      {/* Physical card — navy gradient, 10px radius max */}
       <div
         className={cn(
-          "premium-navy-card relative flex h-56 flex-col justify-between overflow-hidden rounded-[1.5rem] border border-slate-800 p-6 text-white shadow-2xl transition-all",
+          "premium-navy-card relative flex h-52 flex-col justify-between overflow-hidden rounded-[10px] border border-[#0A1A2E] p-5 text-white shadow-[0_2px_8px_rgba(0,0,0,0.3)]",
           physical.frozen && "opacity-60 saturate-0"
         )}
       >
         {physical.frozen && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center bg-slate-900/40 backdrop-blur-[2px]">
-            <div className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-widest text-sky-300">
-              <Snowflake className="h-4 w-4" />
-              Frozen
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#000F32]/60">
+            <div className="flex items-center gap-2 border border-white/70 px-4 py-2">
+              <Snowflake className="h-4 w-4 text-white" strokeWidth={1.8} />
+              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-white">
+                Frozen
+              </span>
             </div>
           </div>
         )}
-        <div className="absolute right-6 top-6 z-10">
-          <Wifi className="h-6 w-6 rotate-90 text-slate-400 opacity-70" />
-        </div>
-        <div className="relative z-10 h-9 w-12 overflow-hidden rounded-md bg-gradient-to-br from-[#d4af37] via-[#f3e5ab] to-[#aa8017] shadow-inner">
-          <div className="absolute left-[30%] top-0 h-full w-[1px] bg-slate-900/40" />
-          <div className="absolute left-[70%] top-0 h-full w-[1px] bg-slate-900/40" />
-          <div className="absolute top-[40%] h-[1px] w-full bg-slate-900/40" />
-          <div className="absolute top-[60%] h-[1px] w-full bg-slate-900/40" />
+
+        <div className="relative z-10 flex items-start justify-between">
+          <CbiLogo height={15} wordmarkColor="#FFFFFF" />
+          <Wifi
+            className="h-5 w-5 rotate-90 text-white/70"
+            strokeWidth={1.6}
+          />
         </div>
 
-        <div className="relative z-10 mt-6">
-          <p className="font-mono text-[1.4rem] font-bold tracking-[0.2em] text-white drop-shadow-md">
+        <div className="relative z-10 h-8 w-12 overflow-hidden bg-[#C8A96A]">
+          <div className="absolute left-[30%] top-0 h-full w-[1px] bg-[#8A6D3B]" />
+          <div className="absolute left-[70%] top-0 h-full w-[1px] bg-[#8A6D3B]" />
+          <div className="absolute top-[40%] h-[1px] w-full bg-[#8A6D3B]" />
+          <div className="absolute top-[60%] h-[1px] w-full bg-[#8A6D3B]" />
+        </div>
+
+        <div className="relative z-10">
+          <p className="font-mono text-[16px] font-bold tracking-[0.12em] text-white">
             {physical.number}
           </p>
         </div>
 
         <div className="relative z-10 flex items-end justify-between">
           <div>
-            <p className="mb-1 text-[9px] font-bold uppercase tracking-widest text-slate-400">
+            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-white/70">
               {physical.label}
             </p>
-            <p className="text-sm font-black tracking-widest text-slate-100">
+            <p className="mt-0.5 text-[13px] font-bold tracking-[0.08em] text-white">
               {physical.holder}
             </p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-5">
             <div>
-              <p className="mb-1 text-[9px] font-bold uppercase tracking-widest text-slate-400">
+              <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-white/70">
                 Exp
               </p>
-              <p className="font-mono text-sm font-bold">{physical.exp}</p>
+              <p className="font-mono text-[13px] font-bold text-white">
+                {physical.exp}
+              </p>
             </div>
-            <div className="flex -space-x-3.5">
-              <div className="h-8 w-8 rounded-full bg-rose-500 opacity-90 mix-blend-screen" />
-              <div className="h-8 w-8 rounded-full bg-amber-500 opacity-90 mix-blend-screen" />
+            <div className="flex -space-x-2">
+              <div className="h-7 w-7 rounded-full bg-[#C41F30]/80" />
+              <div className="h-7 w-7 rounded-full bg-[#C8A96A]/80" />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Virtual card (compact) */}
+      {/* Virtual card — flat white row */}
       <div
         className={cn(
-          "platinum-card flex h-24 cursor-pointer items-center justify-between rounded-[1.5rem] border border-white p-5 text-slate-800 shadow-md transition-all",
+          "cbi-card flex items-center justify-between px-3 py-3",
           virtual.frozen && "opacity-60 saturate-0"
         )}
       >
-        <div className="flex items-center gap-4">
-          <div className="flex h-12 w-8 items-center justify-center rounded border border-slate-300 bg-slate-200/50">
-            <CreditCard className="h-5 w-5 text-slate-500" />
-          </div>
-          <div>
-            <p className="text-sm font-black">{virtual.label}</p>
-            <p className="mt-1 font-mono text-xs font-bold text-slate-500">
-              **** {virtual.number.slice(-4)} • Exp {virtual.exp}
+        <div className="flex min-w-0 items-center gap-3">
+          <HexagonIcon width={40}>
+            <CreditCard className="h-[15px] w-[15px]" strokeWidth={1.8} />
+          </HexagonIcon>
+          <div className="min-w-0">
+            <p className="text-[13px] font-bold text-[#333333]">
+              {virtual.label}
+            </p>
+            <p className="mt-0.5 font-mono text-[11.5px] text-[#7F7F7F]">
+              **** {virtual.number.slice(-4)} · Exp {virtual.exp}
             </p>
           </div>
         </div>
         <button
-          onClick={() => toast(`Virtual card ••${virtual.number.slice(-4)} details`, "info")}
-          className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm"
+          onClick={() =>
+            toast(`Virtual card ••${virtual.number.slice(-4)} details`, "info")
+          }
+          className="ml-3 shrink-0 py-2.5 pl-3 pr-1 text-[12px] font-bold uppercase tracking-[0.08em] text-[#1565C0] active:opacity-70"
         >
           Details
         </button>
       </div>
 
-      {/* Controls */}
-      <div className="overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white shadow-sm">
+      {/* Card controls — flat white list with hairline separators */}
+      <div className="cbi-card">
         {/* Freeze physical */}
-        <div className="flex items-center justify-between border-b border-slate-100 p-5">
-          <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
-              <Lock className="h-4 w-4 stroke-[2.5]" />
-            </div>
+        <div className="flex items-center justify-between border-b border-[#E5E5E5] px-3 py-2.5">
+          <div className="flex items-center gap-3">
+            <Lock className="h-5 w-5 shrink-0 text-[#7A1F3D]" strokeWidth={1.8} />
             <div>
-              <p className="text-sm font-black text-slate-900">Freeze Physical Card</p>
-              <p className="mt-0.5 text-xs font-semibold text-slate-500">
+              <p className="text-[13px] font-bold text-[#333333]">
+                Freeze Physical Card
+              </p>
+              <p className="mt-0.5 text-[11.5px] text-[#7F7F7F]">
                 Block all POS and ATM usage
               </p>
             </div>
@@ -168,14 +181,17 @@ export function CardsTab() {
         </div>
 
         {/* Freeze virtual */}
-        <div className="flex items-center justify-between border-b border-slate-100 p-5">
-          <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-50 text-purple-600">
-              <Snowflake className="h-4 w-4 stroke-[2.5]" />
-            </div>
+        <div className="flex items-center justify-between border-b border-[#E5E5E5] px-3 py-2.5">
+          <div className="flex items-center gap-3">
+            <Snowflake
+              className="h-5 w-5 shrink-0 text-[#7A1F3D]"
+              strokeWidth={1.8}
+            />
             <div>
-              <p className="text-sm font-black text-slate-900">Freeze Virtual Card</p>
-              <p className="mt-0.5 text-xs font-semibold text-slate-500">
+              <p className="text-[13px] font-bold text-[#333333]">
+                Freeze Virtual Card
+              </p>
+              <p className="mt-0.5 text-[11.5px] text-[#7F7F7F]">
                 Pause online spending instantly
               </p>
             </div>
@@ -195,40 +211,43 @@ export function CardsTab() {
         {/* Spending limits */}
         <button
           onClick={() => setLimitsCard(physical)}
-          className="active-scale flex w-full items-center justify-between border-b border-slate-100 p-5 text-left transition-colors hover:bg-slate-50"
+          className="flex min-h-[56px] w-full items-center justify-between border-b border-[#E5E5E5] px-3 py-2.5 text-left active:opacity-70"
         >
-          <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-blue-600">
-              <SlidersHorizontal className="h-4 w-4 stroke-[2.5]" />
-            </div>
+          <div className="flex items-center gap-3">
+            <SlidersHorizontal
+              className="h-5 w-5 shrink-0 text-[#7A1F3D]"
+              strokeWidth={1.8}
+            />
             <div>
-              <p className="text-sm font-black text-slate-900">Spending Limits</p>
-              <p className="mt-0.5 text-xs font-semibold text-slate-500">
+              <p className="text-[13px] font-bold text-[#333333]">
+                Spending Limits
+              </p>
+              <p className="mt-0.5 text-[11.5px] text-[#7F7F7F]">
                 {formatEUR(physical.daily_limit)} daily /{" "}
                 {formatEUR(physical.monthly_limit)} monthly
               </p>
             </div>
           </div>
-          <ChevronRight className="h-5 w-5 text-slate-300" />
+          <ChevronRight className="h-4 w-4 shrink-0 text-[#8C8C8C]" />
         </button>
 
         {/* Reveal PIN */}
         <button
           onClick={() => startReveal(physical)}
-          className="active-scale flex w-full items-center justify-between p-5 text-left transition-colors hover:bg-slate-50"
+          className="flex min-h-[56px] w-full items-center justify-between px-3 py-2.5 text-left active:opacity-70"
         >
-          <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-50 text-amber-600">
-              <Eye className="h-4 w-4 stroke-[2.5]" />
-            </div>
+          <div className="flex items-center gap-3">
+            <Eye className="h-5 w-5 shrink-0 text-[#7A1F3D]" strokeWidth={1.8} />
             <div>
-              <p className="text-sm font-black text-slate-900">Reveal PIN & Details</p>
-              <p className="mt-0.5 text-xs font-semibold text-slate-500">
+              <p className="text-[13px] font-bold text-[#333333]">
+                Reveal PIN &amp; Details
+              </p>
+              <p className="mt-0.5 text-[11.5px] text-[#7F7F7F]">
                 Secure biometric check
               </p>
             </div>
           </div>
-          <ChevronRight className="h-5 w-5 text-slate-300" />
+          <ChevronRight className="h-4 w-4 shrink-0 text-[#8C8C8C]" />
         </button>
       </div>
 
@@ -256,7 +275,7 @@ export function CardsTab() {
   );
 }
 
-/** Biometric-gated card details reveal modal. */
+/** Biometric-gated card details reveal modal — flat white, magenta header strip. */
 function RevealCardModal({
   card,
   verifying,
@@ -269,103 +288,87 @@ function RevealCardModal({
   onClose: () => void;
 }) {
   // Demo: a simulated PIN derived from the card number (last 4 + middle 2).
-  const pin = `${card.number.replace(/\s/g, "").slice(-4)}`.split("").map((d, i) => (i % 2 === 0 ? d : "•")).join("");
-  const cvv = (card.number.replace(/\s/g, "").slice(-3));
+  const pin = `${card.number.replace(/\s/g, "").slice(-4)}`
+    .split("")
+    .map((d, i) => (i % 2 === 0 ? d : "•"))
+    .join("");
+  const cvv = card.number.replace(/\s/g, "").slice(-3);
 
   return (
     <div
-      className="fixed inset-0 z-[85] flex items-end justify-center bg-slate-900/60 backdrop-blur-sm"
+      className="fixed inset-0 z-[85] flex items-center justify-center bg-[#000F32]/60 px-4"
       onClick={onClose}
     >
       <div
-        className="aspidus-sheet w-full max-w-md rounded-t-[2rem] bg-white p-6 pb-8 shadow-2xl"
+        className="fade-in max-h-[88vh] w-full max-w-md overflow-y-auto hide-scrollbar bg-white shadow-[0_4px_20px_rgba(0,0,0,0.35)]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-slate-200" />
-
-        <div className="mb-5 flex items-center justify-between">
+        <div className="flex h-[48px] items-center justify-between bg-[#82134C] px-3">
           <div>
-            <h2 className="text-base font-black text-slate-900">Card Details</h2>
-            <p className="text-xs font-semibold text-slate-500">{card.label}</p>
+            <h2 className="text-[15px] font-bold text-white">Card Details</h2>
+            <p className="text-[11px] text-white/80">{card.label}</p>
           </div>
           <button
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100"
+            className="flex h-9 w-9 items-center justify-center text-white active:opacity-70"
             aria-label="Close"
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" strokeWidth={1.8} />
           </button>
         </div>
 
-        {verifying ? (
-          <div className="flex flex-col items-center py-10">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full border border-slate-200 bg-slate-50">
-              <ScanFace className="h-12 w-12 animate-pulse text-slate-700" />
-            </div>
-            <p className="mt-5 text-xs font-bold uppercase tracking-widest text-slate-500">
-              Scanning biometrics…
-            </p>
-            <p className="mt-1 text-[10px] font-medium text-slate-400">
-              Look at the camera / touch the sensor
-            </p>
-          </div>
-        ) : revealed ? (
-          <div className="flex flex-col gap-3">
-            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-              <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                Card Number
+        <div className="px-4 py-3">
+          {verifying ? (
+            <div className="flex flex-col items-center py-8">
+              <HexagonIcon width={72}>
+                <ScanFace className="h-8 w-8 animate-pulse" strokeWidth={1.4} />
+              </HexagonIcon>
+              <p className="mt-4 text-[12px] font-bold uppercase tracking-[0.15em] text-[#7F7F7F]">
+                Scanning biometrics…
               </p>
-              <p className="font-mono text-base font-black tracking-wider text-slate-900">
-                {card.number}
+              <p className="mt-1 text-[11px] text-[#8C8C8C]">
+                Look at the camera / touch the sensor
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                  PIN
-                </p>
-                <p className="font-mono text-lg font-black tracking-[0.4em] text-slate-900">
-                  {pin}
-                </p>
-              </div>
-              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                  CVV
-                </p>
-                <p className="font-mono text-lg font-black tracking-[0.4em] text-slate-900">
-                  {cvv}
-                </p>
+          ) : revealed ? (
+            <div className="flex flex-col">
+              <DetailRow label="Card Number" value={card.number} mono />
+              <DetailRow label="PIN" value={pin} mono />
+              <DetailRow label="CVV" value={cvv} mono />
+              <DetailRow label="Expiry · Holder" value={`${card.exp} · ${card.holder}`} />
+              <div className="mb-1 mt-3 flex items-center gap-2 border border-[#217A3B]/40 px-3 py-2 text-[11.5px] text-[#217A3B]">
+                <Check className="h-4 w-4 shrink-0" strokeWidth={2} />
+                Identity verified — details will hide when you close this.
               </div>
             </div>
-            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-              <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                Expiry · Holder
-              </p>
-              <p className="text-sm font-black text-slate-900">
-                {card.exp} · {card.holder}
-              </p>
-            </div>
-            <div className="mt-2 flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700">
-              <Check className="h-3.5 w-3.5 shrink-0" />
-              Identity verified — details will hide when you close this.
-            </div>
-          </div>
-        ) : null}
-
-        <style jsx>{`
-          .aspidus-sheet {
-            animation: aspidus-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-          }
-          @keyframes aspidus-up {
-            from {
-              transform: translateY(100%);
-            }
-            to {
-              transform: translateY(0);
-            }
-          }
-        `}</style>
+          ) : null}
+        </div>
       </div>
+    </div>
+  );
+}
+
+/** Flat label-left / value-right row with hairline separator. */
+function DetailRow({
+  label,
+  value,
+  mono,
+}: {
+  label: string;
+  value: string;
+  mono?: boolean;
+}) {
+  return (
+    <div className="flex items-baseline justify-between gap-4 border-b border-[#E5E5E5] py-2.5 last:border-b-0">
+      <span className="shrink-0 text-[12px] text-[#7F7F7F]">{label}</span>
+      <span
+        className={cn(
+          "text-[13px] font-bold text-[#222222]",
+          mono && "font-mono tracking-[0.15em]"
+        )}
+      >
+        {value}
+      </span>
     </div>
   );
 }
@@ -384,13 +387,13 @@ function ToggleSwitch({
       onClick={onChange}
       className={cn(
         "active-scale relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full transition-colors",
-        checked ? "bg-blue-700" : "bg-slate-200"
+        checked ? "bg-[#1565C0]" : "bg-[#D9D9D9]"
       )}
     >
       <span
         className={cn(
           "inline-block h-5 w-5 transform rounded-full border bg-white shadow transition-transform",
-          checked ? "translate-x-6 border-white" : "translate-x-1 border-slate-300"
+          checked ? "translate-x-6 border-[#0D2B6B]" : "translate-x-1 border-[#BFBFBF]"
         )}
       />
     </button>

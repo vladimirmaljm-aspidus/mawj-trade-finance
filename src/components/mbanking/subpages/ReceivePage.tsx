@@ -3,6 +3,7 @@
 import { Copy } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { SubPage } from "../SubPage";
+import { CbiButton } from "../cbi";
 import { useMbanking, BANK } from "@/lib/mbanking/store";
 import { toast } from "@/lib/mbanking/toast";
 
@@ -26,35 +27,57 @@ export function ReceivePage() {
 
   return (
     <SubPage title="Funding Details">
-      <div className="flex flex-col items-center p-6 pt-8">
-        <div className="mb-6 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-md">
+      <div className="px-3 py-3">
+        {/* Beneficiary */}
+        <div className="cbi-card px-3 py-3">
+          <p className="text-[15px] font-bold text-[#595959]">{companyName}</p>
+          <p className="mt-0.5 text-[11px] text-[#7F7F7F]">{primary?.label ?? "EUR Main Treasury"}</p>
+        </div>
+
+        {/* QR — flat white card */}
+        <div className="mt-2 cbi-card flex flex-col items-center px-3 py-4">
           <QRCodeSVG
             value={sepaString}
-            size={200}
+            size={180}
             level="M"
             bgColor="#ffffff"
-            fgColor="#0a1628"
+            fgColor="#000F32"
           />
+          <p className="mt-2 text-[10px] uppercase text-[#9E9E9E]">Scan · SEPA Credit Transfer</p>
         </div>
-        <h3 className="mb-1 text-2xl font-black tracking-tight text-slate-900">
-          {companyName}
-        </h3>
-        <p className="mb-8 rounded-full bg-blue-50 px-3 py-1 text-xs font-bold uppercase tracking-widest text-blue-700">
-          {primary?.label ?? "EUR Main Treasury"}
-        </p>
 
-        <CopyRow label="IBAN (SEPA)" value={iban} onCopy={() => copy("IBAN", iban)} />
-        <CopyRow label="BIC / SWIFT" value={bic} onCopy={() => copy("BIC", bic)} />
-        <CopyRow
-          label="Beneficiary"
-          value={companyName}
-          onCopy={() => copy("Beneficiary", companyName)}
-        />
+        {/* Account details rows */}
+        <div className="mt-2 cbi-card px-3 py-2.5">
+          <p className="pb-1 text-[15px] font-bold text-[#595959]">Account Details</p>
+          <div className="border-t border-[#E5E5E5] pt-1">
+            <CopyRow label="IBAN (SEPA)" value={iban} onCopy={() => copy("IBAN", iban)} />
+            <CopyRow label="BIC / SWIFT" value={bic} onCopy={() => copy("BIC", bic)} />
+            <CopyRow
+              label="Beneficiary"
+              value={companyName}
+              onCopy={() => copy("Beneficiary", companyName)}
+            />
+            <CopyRow
+              label="Bank"
+              value={BANK.legalName}
+              onCopy={() => copy("Bank", BANK.legalName)}
+            />
+          </div>
+        </div>
 
-        <p className="mt-8 px-6 text-center text-[11px] font-semibold text-slate-400">
+        <div className="mt-3">
+          <CbiButton onClick={() => copy("Account details", sepaString)}>
+            <span className="flex items-center justify-center gap-2">
+              <Copy className="h-4 w-4" strokeWidth={1.8} />
+              Share Details
+            </span>
+          </CbiButton>
+        </div>
+
+        <p className="mt-3 px-2 text-center text-[11px] leading-relaxed text-[#7F7F7F]">
           Funds typically settle same business day for SEPA, 1–3 days for SWIFT.
         </p>
-        <p className="mt-3 text-center text-[10px] font-bold uppercase tracking-widest text-slate-300">
+        <p className="mt-2 text-center text-[10px] uppercase text-[#9E9E9E]">
           Routed via {BANK.shortName} · {BANK.license}
         </p>
       </div>
@@ -72,19 +95,17 @@ function CopyRow({
   onCopy: () => void;
 }) {
   return (
-    <div className="mb-3 flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="min-w-0">
-        <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-          {label}
-        </p>
-        <p className="break-all font-mono text-sm font-black text-slate-900">{value}</p>
+    <div className="flex items-center justify-between border-b border-[#E5E5E5] py-2.5 last:border-b-0">
+      <div className="min-w-0 pr-2">
+        <p className="text-[12px] text-[#7F7F7F]">{label}</p>
+        <p className="mt-0.5 break-all font-mono text-[13px] font-bold text-[#222222]">{value}</p>
       </div>
       <button
         onClick={onCopy}
-        className="active-scale ml-3 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-900"
+        className="ml-2 flex h-9 w-9 shrink-0 items-center justify-center border border-[#D9D9D9] bg-white text-[#7A1F3D] active:opacity-70"
         aria-label={`Copy ${label}`}
       >
-        <Copy className="h-4 w-4" />
+        <Copy className="h-4 w-4" strokeWidth={1.8} />
       </button>
     </div>
   );

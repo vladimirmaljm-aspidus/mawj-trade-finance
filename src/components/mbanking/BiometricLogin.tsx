@@ -10,8 +10,8 @@ import type {
   RegistrationResponseJSON,
   AuthenticationResponseJSON,
 } from "@simplewebauthn/browser";
-import { Fingerprint, ScanFace, ShieldCheck, AlertCircle, ChevronRight } from "lucide-react";
-import { BANK } from "@/lib/mbanking/store";
+import { Fingerprint, ChevronLeft } from "lucide-react";
+import { CbiHeader, CbiFooter, CbiButton } from "./cbi";
 import { toast } from "@/lib/mbanking/toast";
 
 const CRED_ID_KEY = "cbi.credId";
@@ -27,22 +27,24 @@ function deviceLabel(): string {
   return "This device";
 }
 
+type LoginMode = "menu" | "username" | "password";
+
 interface Props {
   onAuthenticated: () => void;
 }
 
 export function BiometricLogin({ onAuthenticated }: Props) {
+  const [mode, setMode] = useState<LoginMode>("menu");
   const [supported, setSupported] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [passcode, setPasscode] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
-    const ok = browserSupportsWebAuthn();
-    setSupported(ok);
+    setSupported(browserSupportsWebAuthn());
   }, []);
 
-  /** Ako stari kredencijal ne postoji u bazi — obriši lokalni i kreni iznova. */
   const clearStaleCredential = () => {
     try {
       localStorage.removeItem(CRED_ID_KEY);
@@ -51,20 +53,21 @@ export function BiometricLogin({ onAuthenticated }: Props) {
     }
   };
 
+  /* ---------- Passcode (password step) ---------- */
   const handlePasscode = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (passcode.length !== 6) return;
+    if (!password) return;
     setBusy(true);
     setError(null);
     try {
       const res = await fetch("/api/passcode", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ passcode }),
+        body: JSON.stringify({ passcode: password }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Invalid access code.");
-      toast("Access granted", "success");
+      if (!res.ok) throw new Error(data.error || "Invalid password.");
+      toast("Welcome to CBI Mobile Banking", "success");
       onAuthenticated();
     } catch (err) {
       setError((err as Error).message);
@@ -72,18 +75,18 @@ export function BiometricLogin({ onAuthenticated }: Props) {
     }
   };
 
+  /* ---------- Biometric ---------- */
   const handleBiometric = async () => {
     setBusy(true);
     setError(null);
     try {
       if (!browserSupportsWebAuthn()) {
-        setError("This device does not support biometrics. Use the access code below.");
+        setError("Biometric login is not supported on this device. Use LOGIN instead.");
         setBusy(false);
         return;
       }
       const hasCred = Boolean(localStorage.getItem(CRED_ID_KEY));
       if (hasCred) {
-        // Autentikacija postojećeg kredencijala
         const opts = await fetch("/api/biometric/auth/options").then((r) => r.json());
         if (!opts.options) throw new Error(opts.error || "Could not start authentication.");
         const asst = (await startAuthentication({
@@ -96,18 +99,16 @@ export function BiometricLogin({ onAuthenticated }: Props) {
         });
         const data = await res.json();
         if (!res.ok) {
-          // Stari kredencijal više ne postoji u bazi — obriši i probaj enrollment
           clearStaleCredential();
           throw new Error(
             data.error?.includes("Unknown credential")
-              ? "Saved biometrics no longer recognized. Tap the fingerprint again to re-enable."
+              ? "Saved biometrics no longer recognized. Tap BIOMETRIC LOGIN again to re-enable."
               : data.error || "Authentication failed."
           );
         }
-        toast("Identity verified", "success");
+        toast("Welcome to CBI Mobile Banking", "success");
         onAuthenticated();
       } else {
-        // Prvi put — enrollment
         const opts = await fetch("/api/biometric/register/options").then((r) => r.json());
         if (!opts.options) throw new Error(opts.error || "Could not start enrollment.");
         const att = (await startRegistration({
@@ -135,96 +136,148 @@ export function BiometricLogin({ onAuthenticated }: Props) {
     }
   };
 
+  const demoNotice = (what: string) =>
+    toast(`${what} is not part of this demo. Use LOGIN or BIOMETRIC LOGIN.`, "info");
+
   return (
-    <div className="fixed inset-0 z-[200] flex flex-col bg-[#0a1a2e]">
-      {/* UAE flag accent strip — top */}
-      <div className="uae-flag-accent absolute left-0 right-0 top-0 h-1" />
+    <div className="fixed inset-0 z-[200] flex flex-col bg-[#F7F7F7]">
+      <CbiHeader title="Mobile Banking" />
 
-      {/* Subtle teal glow */}
-      <div
-        className="pointer-events-none absolute right-[-120px] top-[-100px] h-80 w-80 rounded-full opacity-20"
-        style={{ background: "radial-gradient(circle, rgba(46,110,158,0.5) 0%, transparent 70%)" }}
-      />
+      <div className="hide-scrollbar flex-1 overflow-y-auto">
+        {mode === "menu" && (
+          <div className="px-3 pb-6 pt-4">
+            {/* 4 stacked full-width buttons — like the real CBI pre-login */}
+            <div className="flex flex-col gap-3">
+              <CbiButton onClick={() => setMode("username")}>Login</CbiButton>
+              <CbiButton onClick={() => demoNotice("Register")}>Register</CbiButton>
+              <CbiButton onClick={() => demoNotice("Branch & ATM")}>Branch &amp; ATM</CbiButton>
+              <CbiButton onClick={handleBiometric} disabled={busy}>
+                {busy ? "Please wait…" : "Biometric Login"}
+              </CbiButton>
+            </div>
 
-      {/* Content */}
-      <div className="relative z-10 flex h-full flex-col items-center justify-center px-7">
-        {/* CBI logo */}
-        <div className="mb-8 flex flex-col items-center">
-          <img
-            src="/icons/cbi-logo-full.png"
-            alt="Commercial Bank International"
-            className="h-16 w-auto mb-4 drop-shadow-lg"
-            style={{ filter: "brightness(0) invert(1)" }}
-          />
-          <div className="h-px w-16 bg-white/25 mb-3" />
-          <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-white/70">
-            Corporate Treasury
-          </p>
-          <p className="mt-1 text-[11px] font-medium text-white/50">
-            Authorized signatory access
-          </p>
-        </div>
+            {error && (
+              <p className="mt-3 px-1 text-[12px] leading-relaxed text-[#C00000]">{error}</p>
+            )}
 
-        {/* Access code — UVEK vidljiv (primarna metoda kao u pravim bankama) */}
-        <form onSubmit={handlePasscode} className="w-full max-w-xs">
-          <label className="mb-2 block text-center text-[10px] font-bold uppercase tracking-[0.3em] text-white/60">
-            Access code
-          </label>
-          <input
-            type="password"
-            inputMode="numeric"
-            autoComplete="off"
-            value={passcode}
-            onChange={(e) => setPasscode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-            placeholder="• • • • • •"
-            className="w-full rounded-xl border border-white/10 bg-white/[0.06] py-3.5 text-center text-xl font-black tracking-[0.6em] text-white outline-none placeholder:text-white/30 focus:border-white/30"
-          />
-          <button
-            type="submit"
-            disabled={passcode.length !== 6 || busy}
-            className="mt-3 w-full rounded-xl py-3.5 text-sm font-black transition-colors disabled:opacity-40"
-            style={{ background: "#C21E56", color: "white" }}
-          >
-            {busy ? "Verifying…" : "Log In"}
-          </button>
-        </form>
+            {/* Promo banner — like the real app's eSaver card */}
+            <div className="cbi-card mt-5 px-4 py-4">
+              <p className="text-[13px] font-bold text-[#595959]">
+                CBI Corporate Treasury on Mobile
+              </p>
+              <p className="mt-1 text-[12px] leading-relaxed text-[#7F7F7F]">
+                Manage corporate accounts, transfers and FX from anywhere —
+                approved for authorized signatories.
+              </p>
+              <div className="mt-2.5 flex items-center gap-1.5">
+                <Fingerprint className="h-3.5 w-3.5 text-[#7A1F3D]" />
+                <span className="text-[11px] text-[#7F7F7F]">
+                  Secured with FIDO2 biometric authentication
+                </span>
+              </div>
+            </div>
 
-        {/* Biometrija — sekundarna opcija ispod */}
-        <button
-          onClick={handleBiometric}
-          disabled={busy}
-          className="group mt-6 flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] shadow-xl transition-all hover:bg-white/[0.12] disabled:opacity-60"
-          aria-label="Use biometrics"
-        >
-          {busy ? (
-            <ScanFace className="h-8 w-8 animate-pulse text-white" />
-          ) : (
-            <Fingerprint className="h-8 w-8 text-white transition-transform group-hover:scale-105" />
-          )}
-        </button>
-        <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
-          {supported === false ? "Not available on this device" : "Use Face ID / fingerprint"}
-        </p>
-
-        {/* Error */}
-        {error && (
-          <div className="mt-5 flex max-w-xs items-start gap-2 rounded-lg border border-rose-500/20 bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-300">
-            <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-            <span className="text-left leading-relaxed">{error}</span>
+            {/* Footer links row — like the real pre-login screen */}
+            <div className="mt-5 flex items-start justify-between px-1 pb-2 text-[12px] text-[#000F32]">
+              <div className="flex flex-col gap-2">
+                <button className="active:opacity-60" onClick={() => demoNotice("Contact Us")}>
+                  Contact Us
+                </button>
+                <button className="active:opacity-60" onClick={() => demoNotice("Help")}>
+                  Help
+                </button>
+              </div>
+              <div className="flex flex-col items-end gap-2">
+                <button
+                  className="active:opacity-60"
+                  onClick={() => demoNotice("Forgot Username")}
+                >
+                  Forgot Username?
+                </button>
+                <button
+                  className="active:opacity-60"
+                  onClick={() => demoNotice("Forgot Password")}
+                >
+                  Forgot Password?
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* Footer */}
-        <div className="absolute bottom-7 flex flex-col items-center gap-1.5">
-          <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.25em] text-white/40">
-            <ShieldCheck className="h-3 w-3" />
-            Bank-grade encryption · FIDO2 / WebAuthn
-          </div>
-          <p className="text-[9px] font-medium text-white/30">
-            {BANK.legalName} · Regulated by the Central Bank of the UAE
-          </p>
-        </div>
+        {mode === "username" && (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (username.trim()) setMode("password");
+            }}
+            className="px-3 pb-6 pt-4"
+          >
+            <div className="cbi-card px-4 pb-5 pt-5">
+              <label className="text-[13px] font-medium text-[#E8306E]">Username</label>
+              <input
+                autoFocus
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="mt-2 w-full border-0 border-b-2 border-[#E8306E] bg-transparent pb-2 text-[15px] text-[#222] outline-none placeholder:text-[#C4C4C4]"
+                placeholder="Enter your username"
+              />
+            </div>
+            <div className="mt-4">
+              <CbiButton type="submit" disabled={!username.trim()}>
+                Next
+              </CbiButton>
+            </div>
+            <button
+              type="button"
+              onClick={() => setMode("menu")}
+              className="mt-4 flex items-center gap-1 px-1 text-[13px] text-[#000F32] active:opacity-60"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Back
+            </button>
+            <p className="mt-3 px-1 text-[11px] text-[#9E9E9E]">
+              Demo tip: any username works in this environment.
+            </p>
+          </form>
+        )}
+
+        {mode === "password" && (
+          <form onSubmit={handlePasscode} className="px-3 pb-6 pt-4">
+            <div className="cbi-card px-4 pb-5 pt-5">
+              <label className="text-[13px] font-medium text-[#E8306E]">Password</label>
+              <input
+                autoFocus
+                type="password"
+                inputMode="numeric"
+                autoComplete="off"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="mt-2 w-full border-0 border-b-2 border-[#E8306E] bg-transparent pb-2 text-[15px] text-[#222] outline-none placeholder:text-[#C4C4C4]"
+                placeholder="Enter your password"
+              />
+            </div>
+            <div className="mt-4">
+              <CbiButton type="submit" disabled={!password || busy}>
+                {busy ? "Please wait…" : "Login"}
+              </CbiButton>
+            </div>
+            <button
+              type="button"
+              onClick={() => setMode("username")}
+              className="mt-4 flex items-center gap-1 px-1 text-[13px] text-[#000F32] active:opacity-60"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Back
+            </button>
+            {error && (
+              <p className="mt-3 px-1 text-[12px] leading-relaxed text-[#C00000]">{error}</p>
+            )}
+          </form>
+        )}
       </div>
+
+      <CbiFooter />
     </div>
   );
 }

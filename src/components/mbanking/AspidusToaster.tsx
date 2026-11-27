@@ -4,23 +4,24 @@ import { useToastStore } from "@/lib/mbanking/toast";
 import { Info, CheckCircle2, AlertCircle } from "lucide-react";
 
 const TONE_STYLES = {
-  info: { icon: Info, iconColor: "text-emerald-400" },
-  success: { icon: CheckCircle2, iconColor: "text-emerald-400" },
-  error: { icon: AlertCircle, iconColor: "text-rose-400" },
+  info: { icon: Info, iconColor: "text-white" },
+  success: { icon: CheckCircle2, iconColor: "text-white" },
+  error: { icon: AlertCircle, iconColor: "text-white" },
 } as const;
 
+/** Flat CBI-style toast: navy bar, sharp corners, white text. */
 export function AspidusToaster() {
   const toasts = useToastStore((s) => s.toasts);
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-8 z-[100] flex flex-col items-center gap-2 px-4">
+    <div className="pointer-events-none fixed inset-x-0 bottom-12 z-[100] flex flex-col items-center gap-2 px-4">
       {toasts.map((t) => {
         const tone = TONE_STYLES[t.tone ?? "info"];
         const Icon = tone.icon;
         return (
           <div
             key={t.id}
-            className="aspidus-toast-enter pointer-events-auto flex max-w-[92%] items-center gap-3 rounded-2xl border border-slate-700 bg-slate-900 px-5 py-3.5 text-xs font-bold text-white shadow-2xl"
+            className="aspidus-toast-enter pointer-events-auto flex max-w-[92%] items-center gap-2.5 border-l-[3px] border-l-white bg-[#000F32] px-4 py-3 text-[12.5px] font-medium text-white shadow-md"
           >
             <Icon className={`h-4 w-4 ${tone.iconColor}`} />
             <span>{t.message}</span>

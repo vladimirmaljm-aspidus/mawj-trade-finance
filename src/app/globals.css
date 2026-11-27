@@ -6,7 +6,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-ubuntu);
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -84,7 +84,7 @@
   }
   html,
   body {
-    font-family: var(--font-inter), system-ui, sans-serif;
+    font-family: var(--font-ubuntu), system-ui, sans-serif;
     -webkit-tap-highlight-color: transparent;
     overscroll-behavior-y: none;
   }
@@ -95,36 +95,52 @@
    ============================================================ */
 
 @layer utilities {
-  /* Glass effect for floating navigation */
-  .glass-effect {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+  /* ============================================================
+     CBI authentic design tokens
+     ============================================================ */
+
+  /* Signature navy → magenta diagonal gradient (header / footer) */
+  .cbi-header-gradient {
+    background: linear-gradient(100deg, #000F32 0%, #001030 40%, #70024D 100%);
+  }
+  .cbi-footer-gradient {
+    background: linear-gradient(90deg, #000F32 0%, #70024D 100%);
   }
 
-  /* Premium bank card — CBI navy/teal plava (prave CBI brand boje).
-     Used for the balance hero card and the physical metal card. */
+  /* White pennant ribbon — pointed right tip (header brand device) */
+  .cbi-pennant {
+    clip-path: polygon(0 0, 87% 0, 100% 50%, 87% 100%, 0 100%);
+    padding-right: 22%;
+  }
+
+  /* Blue gradient button (LOGIN / NEXT etc.) — sharp corners */
+  .cbi-btn-blue {
+    background: linear-gradient(to bottom, #1565C0 0%, #0D2B6B 100%);
+  }
+  .cbi-btn-blue:active {
+    background: linear-gradient(to bottom, #0D2B6B 0%, #0D2B6B 100%);
+  }
+
+  /* Flat white card — hairline border, 4px radius, soft shadow */
+  .cbi-card {
+    background: #ffffff;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  }
+
+  /* Cream body (transfer-menu style list pages) */
+  .cbi-cream {
+    background: #f3e5dc;
+  }
+
+  /* Legacy premium styles kept for backwards compatibility */
   .premium-navy-card,
   .premium-bank-card {
     background: linear-gradient(135deg, #0a1a2e 0%, #1B3A5C 100%);
   }
-  .premium-navy-card::after,
-  .premium-bank-card::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: radial-gradient(
-      circle at top right,
-      rgba(46, 110, 158, 0.25),
-      transparent 60%
-    );
-    pointer-events: none;
-  }
 
-  /* UAE flag accent strip — 4 horizontal bands (red, green, white, black).
-     Used as a subtle national-identity accent on cards and headers.
-     NOTE: This is the horizontal-strip variant (decorative accent). */
+  /* UAE flag accent strip — decorative thin strip */
   .uae-flag-accent {
     background: linear-gradient(
       to bottom,
@@ -135,10 +151,7 @@
     );
   }
 
-  /* Proper UAE flag element — vertical red bar on the left (1/4 width),
-     then 3 horizontal bands (green / white / black) on the right.
-     This is the actual UAE national flag layout. Use .uae-flag for a
-     real flag badge; .uae-flag-accent for a thin decorative strip. */
+  /* Proper UAE flag element (vertical red bar + 3 bands) */
   .uae-flag {
     background:
       linear-gradient(to right, #C8102E 0%, #C8102E 25%, transparent 25%),
@@ -146,11 +159,6 @@
         #007A3D 0%, #007A3D 33.33%,
         #FFFFFF 33.33%, #FFFFFF 66.66%,
         #000000 66.66%, #000000 100%);
-  }
-
-  /* Platinum virtual card */
-  .platinum-card {
-    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
   }
 
   /* Tap feedback for interactive tiles */
@@ -161,11 +169,9 @@
     transform: scale(0.96);
   }
 
-  /* Dotted app background */
+  /* App background — flat light gray like the real app body */
   .app-bg {
-    background-color: #f8fafc;
-    background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
-    background-size: 20px 20px;
+    background-color: #f7f7f7;
   }
 
   /* Hide scrollbars but keep scroll */
@@ -191,6 +197,32 @@
   .toast-show {
     transform: translateY(0) translateX(-50%);
     opacity: 1;
+  }
+
+  /* CBI sub-page slide-in from right */
+  .cbi-slide-in {
+    animation: cbi-slide-in 0.28s ease-out;
+  }
+  @keyframes cbi-slide-in {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  /* CBI drawer slide-in from left */
+  .cbi-drawer-in {
+    animation: cbi-drawer-in 0.28s ease-out;
+  }
+  @keyframes cbi-drawer-in {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
   }
 }
 

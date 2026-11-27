@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   ShieldCheck,
   Building,
@@ -8,13 +9,13 @@ import {
   Headphones,
   LogOut,
   ChevronRight,
-  Lock,
   Activity,
 } from "lucide-react";
 import { useMbanking, BANK } from "@/lib/mbanking/store";
 import { useNav } from "../nav";
 import { toast } from "@/lib/mbanking/toast";
 import { cn } from "@/lib/utils";
+import { CbiAccordionCard, CbiRow, HexagonIcon } from "../cbi";
 
 export function ProfileTab() {
   const requireBiometrics = useMbanking((s) => s.requireBiometrics);
@@ -23,81 +24,111 @@ export function ProfileTab() {
   const profile = useMbanking((s) => s.profile);
   const { openSubPage } = useNav();
 
+  const [companyOpen, setCompanyOpen] = useState(true);
+  const [signatoryOpen, setSignatoryOpen] = useState(false);
+  const [prefsOpen, setPrefsOpen] = useState(true);
+
   const signOut = () => {
     toast("Terminating secure session…", "info");
     setTimeout(() => logout(), 800);
   };
 
-  return (
-    <div className="fade-in flex flex-col gap-6">
-      <h2 className="px-1 text-[1.3rem] font-black tracking-tight text-slate-900">
-        Settings &amp; Security
-      </h2>
+  const initials = (profile?.full_name || "VM")
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2);
 
-      {/* Security score */}
-      <div className="flex items-center justify-between rounded-[1.5rem] bg-gradient-to-r from-blue-700 to-blue-900 p-5 text-white shadow-lg shadow-blue-800/20">
+  return (
+    <div className="fade-in flex flex-col gap-3 p-3 pb-6">
+      {/* Security summary — flat navy card */}
+      <div className="flex items-center justify-between bg-[#000F32] px-4 py-3.5">
         <div>
-          <p className="text-lg font-black">Security Score: 100%</p>
-          <p className="text-sm font-medium opacity-90">
+          <p className="text-[14px] font-bold text-white">Security Score: 100%</p>
+          <p className="mt-0.5 text-[11.5px] text-white/70">
             {requireBiometrics ? "Biometric lock active · FIDO2" : "Biometric lock off"}
           </p>
         </div>
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-          <ShieldCheck className="h-6 w-6 stroke-[2.5] text-white" />
+        <ShieldCheck className="h-6 w-6 text-white/90" strokeWidth={1.6} />
+      </div>
+
+      {/* Signatory summary — hexagon initials */}
+      <div className="cbi-card flex items-center gap-3 px-3 py-3.5">
+        <HexagonIcon width={52}>
+          <span className="text-[12px] font-bold">{initials}</span>
+        </HexagonIcon>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[13.5px] font-bold text-[#333333]">
+            {profile?.full_name || "Vladimir Maljm"}
+          </p>
+          <p className="mt-0.5 truncate text-[11.5px] text-[#7F7F7F]">
+            {profile?.role || "Authorized Signatory"} · {profile?.company_name}
+          </p>
         </div>
       </div>
 
-      {/* Account summary */}
-      <div className="rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-emerald-900 to-slate-900 text-sm font-black text-amber-400">
-            {(profile?.full_name || "VM")
-              .split(" ")
-              .map((n) => n[0])
-              .join("")
-              .slice(0, 2)}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-black text-slate-900">
-              {profile?.full_name || "Vladimir Maljm"}
-            </p>
-            <p className="truncate text-xs font-semibold text-slate-500">
-              {profile?.role || "Authorized Signatory"} · {profile?.company_name}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Settings list */}
-      <div className="overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white shadow-sm">
-        <Row
-          icon={<Building className="h-4 w-4 stroke-[2.5]" />}
-          tone="indigo"
-          label="Company Profile"
+      {/* Company section */}
+      <CbiAccordionCard
+        title="Company Profile"
+        open={companyOpen}
+        onToggle={() => setCompanyOpen((v) => !v)}
+        summaryLabel="Registered Name"
+        summaryValue={profile?.company_name ?? "—"}
+      >
+        <CbiRow label="License No." value={profile?.license_no ?? "—"} />
+        <CbiRow
+          label="Registered Office"
+          value={profile?.registered_office ?? "—"}
+        />
+        <ListRow
+          icon={<Building className="h-5 w-5 text-[#7A1F3D]" strokeWidth={1.8} />}
+          label="View Company Details"
           onClick={() => openSubPage("company-details")}
         />
-        <Row
-          icon={<FileText className="h-4 w-4 stroke-[2.5]" />}
-          tone="blue"
+        <ListRow
+          icon={<FileText className="h-5 w-5 text-[#7A1F3D]" strokeWidth={1.8} />}
           label="Statements & Taxes"
           onClick={() => openSubPage("taxes")}
         />
-        <Row
-          icon={<Activity className="h-4 w-4 stroke-[2.5]" />}
-          tone="emerald"
+      </CbiAccordionCard>
+
+      {/* Signatory section */}
+      <CbiAccordionCard
+        title="Authorized Signatory"
+        open={signatoryOpen}
+        onToggle={() => setSignatoryOpen((v) => !v)}
+        summaryLabel="Name"
+        summaryValue={profile?.full_name ?? "—"}
+      >
+        <CbiRow label="Role" value={profile?.role || "Authorized Signatory"} />
+        <CbiRow label="Email" value={profile?.email ?? "—"} />
+        <CbiRow label="Phone" value={profile?.phone ?? "—"} />
+        <ListRow
+          icon={<Activity className="h-5 w-5 text-[#7A1F3D]" strokeWidth={1.8} />}
           label="Login Activity"
           onClick={() => openSubPage("security")}
         />
+      </CbiAccordionCard>
 
-        {/* Biometric toggle */}
-        <div className="flex items-center justify-between border-b border-slate-50 p-5">
-          <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
-              <ScanFace className="h-4 w-4 stroke-[2.5]" />
-            </div>
+      {/* Preferences & security */}
+      <CbiAccordionCard
+        title="Preferences & Security"
+        open={prefsOpen}
+        onToggle={() => setPrefsOpen((v) => !v)}
+        summaryLabel="Biometric Lock"
+        summaryValue={requireBiometrics ? "Enabled" : "Disabled"}
+      >
+        <div className="flex items-center justify-between border-b border-[#E5E5E5] py-3">
+          <div className="flex items-center gap-3">
+            <ScanFace
+              className="h-5 w-5 shrink-0 text-[#7A1F3D]"
+              strokeWidth={1.8}
+            />
             <div>
-              <p className="text-sm font-black text-slate-900">Biometric Lock</p>
-              <p className="mt-0.5 text-xs font-semibold text-slate-500">
+              <p className="text-[13px] font-bold text-[#333333]">
+                Biometric Lock
+              </p>
+              <p className="mt-0.5 text-[11.5px] text-[#7F7F7F]">
                 Require Face ID / fingerprint on launch
               </p>
             </div>
@@ -115,65 +146,49 @@ export function ProfileTab() {
             }}
           />
         </div>
-
-        <Row
-          icon={<Headphones className="h-4 w-4 stroke-[2.5]" />}
-          tone="amber"
+        <ListRow
+          icon={<Headphones className="h-5 w-5 text-[#7A1F3D]" strokeWidth={1.8} />}
           label="VIP Concierge"
           onClick={() => openSubPage("support")}
         />
+      </CbiAccordionCard>
 
-        <button
-          onClick={signOut}
-          className="active-scale flex w-full items-center justify-between p-5 text-left transition-colors hover:bg-rose-50"
-        >
-          <div className="flex items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-rose-50 text-rose-600">
-              <LogOut className="h-4 w-4 stroke-[2.5]" />
-            </div>
-            <span className="text-sm font-black text-rose-600">Secure Sign Out</span>
-          </div>
-        </button>
-      </div>
+      {/* Sign out — flat maroon outline button */}
+      <button
+        onClick={signOut}
+        className="mt-1 flex w-full items-center justify-center gap-2 border border-[#82134C] bg-white py-3 text-[13px] font-bold uppercase tracking-[0.14em] text-[#82134C] active:opacity-70"
+      >
+        <LogOut className="h-4 w-4" strokeWidth={1.8} />
+        Secure Sign Out
+      </button>
 
-      <p className="px-4 text-center text-[10px] font-bold uppercase tracking-widest text-slate-300">
+      <p className="px-4 text-center text-[10.5px] leading-relaxed text-[#8C8C8C]">
         {BANK.legalName} · {BANK.license} · {BANK.regulatedBy}
       </p>
     </div>
   );
 }
 
-const TONE = {
-  indigo: "bg-emerald-50 text-emerald-700",
-  blue: "bg-blue-50 text-blue-600",
-  emerald: "bg-emerald-50 text-emerald-600",
-  amber: "bg-amber-50 text-amber-600",
-  rose: "bg-rose-50 text-rose-600",
-} as const;
-
-function Row({
+/** Flat list row with maroon icon + › chevron (inside accordion sections). */
+function ListRow({
   icon,
-  tone,
   label,
   onClick,
 }: {
   icon: React.ReactNode;
-  tone: keyof typeof TONE;
   label: string;
   onClick: () => void;
 }) {
   return (
     <button
       onClick={onClick}
-      className="active-scale flex w-full items-center justify-between border-b border-slate-50 p-5 text-left transition-colors hover:bg-slate-50"
+      className="flex w-full items-center justify-between border-b border-[#E5E5E5] py-3 pr-1 text-left last:border-b-0 active:opacity-70"
     >
-      <div className="flex items-center gap-4">
-        <div className={cn("flex h-10 w-10 items-center justify-center rounded-full", TONE[tone])}>
-          {icon}
-        </div>
-        <span className="text-sm font-black text-slate-900">{label}</span>
+      <div className="flex items-center gap-3">
+        {icon}
+        <span className="text-[13px] font-bold text-[#333333]">{label}</span>
       </div>
-      <ChevronRight className="h-4 w-4 text-slate-300" />
+      <ChevronRight className="h-4 w-4 text-[#8C8C8C]" />
     </button>
   );
 }
@@ -192,17 +207,15 @@ function ToggleSwitch({
       onClick={onChange}
       className={cn(
         "active-scale relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full transition-colors",
-        checked ? "bg-blue-700" : "bg-slate-200"
+        checked ? "bg-[#1565C0]" : "bg-[#D9D9D9]"
       )}
     >
       <span
         className={cn(
           "inline-block h-5 w-5 transform rounded-full border bg-white shadow transition-transform",
-          checked ? "translate-x-6 border-white" : "translate-x-1 border-slate-300"
+          checked ? "translate-x-6 border-[#0D2B6B]" : "translate-x-1 border-[#BFBFBF]"
         )}
       />
     </button>
   );
 }
-
-export { Lock };

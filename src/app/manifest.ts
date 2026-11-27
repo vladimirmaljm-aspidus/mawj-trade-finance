@@ -4,16 +4,16 @@ export const dynamic = "force-static";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Commercial Bank International — Corporate Treasury",
+    name: "CBI Mobile Banking",
     short_name: "CBI",
     description:
-      "Corporate banking & trade finance for authorized signatories. Manage liquidity, letters of credit, FX and cross-border payments.",
+      "CBI Mobile Banking — corporate banking & trade finance for authorized signatories. Manage liquidity, transfers, FX and cross-border payments.",
     start_url: "/",
     scope: "/",
     display: "standalone",
     orientation: "portrait",
-    background_color: "#0a1a2e",
-    theme_color: "#1B3A5C",
+    background_color: "#FFFFFF",
+    theme_color: "#000F32",
     categories: ["finance", "business", "productivity"],
     lang: "en",
     dir: "ltr",
@@ -29,19 +29,19 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
     shortcuts: [
       {
-        name: "Send Payment",
-        short_name: "Send",
+        name: "Transfers",
+        short_name: "Transfers",
         description: "Start a new SEPA / SWIFT / local transfer",
         url: "/?tab=payments",
       },
       {
-        name: "Corporate Cards",
+        name: "Cards",
         short_name: "Cards",
         description: "View and manage corporate cards",
         url: "/?tab=cards",
       },
       {
-        name: "Treasury FX",
+        name: "FX Rates",
         short_name: "FX",
         description: "Live FX rates and conversions",
         url: "/?tab=fx",

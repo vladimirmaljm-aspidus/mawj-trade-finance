@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Search, ArrowDownLeft, ArrowUpRight, X } from "lucide-react";
 import { SubPage } from "../SubPage";
+import { CbiSectionTitle } from "../cbi";
 import { useMbanking } from "@/lib/mbanking/store";
 import { TransactionItem } from "../ui/TransactionItem";
 import { monthGroupLabel } from "@/lib/mbanking/format";
@@ -67,28 +68,27 @@ export function AllTransactionsPage() {
       title="All Activity"
       headerRight={
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#9E9E9E]" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search…"
-            className="w-40 rounded-full border border-slate-200 bg-white py-2 pl-9 pr-3 text-xs font-bold text-slate-900 outline-none focus:border-slate-400 sm:w-52"
+            placeholder="Search"
+            className="h-8 w-40 rounded-[2px] border border-[#D9D9D9] bg-white pl-8 pr-2 text-[12px] text-[#222222] outline-none placeholder:text-[#9E9E9E] focus:border-[#82134C] sm:w-52"
           />
         </div>
       }
     >
-      <div className="px-5 pb-10 pt-4">
-        {/* Type filter pills */}
-        <div className="mb-3 flex gap-2">
-          {(["all", "income", "expense"] as TypeFilter[]).map((f) => (
+      <div className="px-3 py-3">
+        {/* Type filter — flat segmented tabs (navy active) */}
+        <div className="cbi-card flex">
+          {(["all", "income", "expense"] as TypeFilter[]).map((f, i) => (
             <button
               key={f}
               onClick={() => setTypeFilter(f)}
               className={cn(
-                "flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold capitalize transition-colors",
-                typeFilter === f
-                  ? "bg-slate-900 text-white"
-                  : "border border-slate-200 bg-white text-slate-500"
+                "flex flex-1 items-center justify-center gap-1.5 py-2.5 text-[12px] font-bold uppercase",
+                i !== 0 && "border-l border-[#E5E5E5]",
+                typeFilter === f ? "bg-[#000F32] text-white" : "text-[#595959] active:opacity-70"
               )}
             >
               {f === "income" && <ArrowDownLeft className="h-3.5 w-3.5" />}
@@ -98,8 +98,8 @@ export function AllTransactionsPage() {
           ))}
         </div>
 
-        {/* Account filter pills */}
-        <div className="mb-4 flex gap-2 overflow-x-auto hide-scrollbar pb-1">
+        {/* Account filter — flat hairline tabs (navy active) */}
+        <div className="mb-3 mt-2 flex gap-1.5 overflow-x-auto hide-scrollbar">
           {([
             { id: "all", label: "All Accounts" },
             { id: "eur", label: "EUR Treasury" },
@@ -110,10 +110,10 @@ export function AllTransactionsPage() {
               key={a.id}
               onClick={() => setAcctFilter(a.id)}
               className={cn(
-                "shrink-0 rounded-full px-3 py-1.5 text-[11px] font-bold transition-colors",
+                "shrink-0 px-3 py-1.5 text-[12px] font-bold",
                 acctFilter === a.id
-                  ? "bg-amber-100 text-amber-800 border border-amber-300"
-                  : "border border-slate-200 bg-white text-slate-500"
+                  ? "bg-[#000F32] text-white"
+                  : "border border-[#D9D9D9] bg-white text-[#7F7F7F] active:opacity-70"
               )}
             >
               {a.label}
@@ -121,40 +121,39 @@ export function AllTransactionsPage() {
           ))}
         </div>
 
-        {filtered.length === 0 ? (
-          <div className="rounded-[1.5rem] border border-slate-200 bg-white p-10 text-center">
-            <p className="text-sm font-bold text-slate-400">No matching transactions</p>
-            {hasFilters && (
-              <button
-                onClick={() => {
-                  setQuery("");
-                  setTypeFilter("all");
-                  setAcctFilter("all");
-                }}
-                className="mt-3 flex items-center gap-1 mx-auto text-xs font-bold text-slate-500"
-              >
-                <X className="h-3 w-3" /> Clear filters
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="flex flex-col gap-5">
-            {grouped.map((group) => (
-              <div key={group.label}>
-                <p className="mb-2 px-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
-                  {group.label}
-                </p>
-                <div className="flex flex-col rounded-[1.5rem] border border-slate-200 bg-white p-2 shadow-sm">
+        {/* Month-grouped transaction list */}
+        <div className="max-h-[calc(100vh-220px)] overflow-y-auto hide-scrollbar">
+          {filtered.length === 0 ? (
+            <div className="cbi-card px-6 py-8 text-center">
+              <p className="text-[13px] font-bold text-[#7F7F7F]">No matching transactions</p>
+              {hasFilters && (
+                <button
+                  onClick={() => {
+                    setQuery("");
+                    setTypeFilter("all");
+                    setAcctFilter("all");
+                  }}
+                  className="mx-auto mt-3 flex items-center gap-1 text-[11px] font-bold uppercase text-[#7A1F3D] active:opacity-70"
+                >
+                  <X className="h-3 w-3" strokeWidth={1.8} /> Clear filters
+                </button>
+              )}
+            </div>
+          ) : (
+            grouped.map((group) => (
+              <div key={group.label} className="mb-3">
+                <CbiSectionTitle>{group.label}</CbiSectionTitle>
+                <div className="cbi-card">
                   {group.items.map((tx) => (
                     <TransactionItem key={tx.id} tx={tx} />
                   ))}
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
 
-        <p className="mt-4 text-center text-[10px] font-bold uppercase tracking-widest text-slate-300">
+        <p className="mt-2 text-center text-[10px] uppercase text-[#9E9E9E]">
           {filtered.length} transaction{filtered.length !== 1 ? "s" : ""}
         </p>
       </div>

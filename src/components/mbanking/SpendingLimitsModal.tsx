@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { X, SlidersHorizontal, TrendingUp, AlertTriangle } from "lucide-react";
+import { X, AlertTriangle } from "lucide-react";
 import type { CardInfo } from "@/lib/mbanking/types";
 import { formatEUR } from "@/lib/mbanking/format";
 import { toast } from "@/lib/mbanking/toast";
 import { cn } from "@/lib/utils";
+import { CbiButton } from "./cbi";
 
 interface Props {
   card: CardInfo;
@@ -13,9 +14,10 @@ interface Props {
 }
 
 /**
- * Spending limits modal — shows daily/monthly limits and a simulated
- * spend-so-far bar. Lets the user adjust the daily limit (demo only —
- * not persisted to the backend in this version).
+ * Spending limits modal — flat white card, sharp corners, magenta header
+ * strip. Shows daily/monthly limits and a simulated spend-so-far bar. Lets
+ * the user adjust the daily limit (demo only — not persisted to the
+ * backend in this version).
  */
 export function SpendingLimitsModal({ card, onClose }: Props) {
   const [daily, setDaily] = useState(card.daily_limit);
@@ -35,142 +37,124 @@ export function SpendingLimitsModal({ card, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-[85] flex items-end justify-center bg-slate-900/50 backdrop-blur-sm"
+      className="fixed inset-0 z-[85] flex items-center justify-center bg-[#000F32]/60 px-4"
       onClick={onClose}
     >
       <div
-        className="aspidus-sheet w-full max-w-md rounded-t-[2rem] bg-white p-6 pb-8 shadow-2xl"
+        className="fade-in max-h-[88vh] w-full max-w-md overflow-y-auto hide-scrollbar bg-white shadow-[0_4px_20px_rgba(0,0,0,0.35)]"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Handle */}
-        <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-slate-200" />
-
-        <div className="mb-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-700">
-              <SlidersHorizontal className="h-4 w-4" />
-            </div>
-            <div>
-              <h2 className="text-base font-black text-slate-900">Spending Limits</h2>
-              <p className="text-xs font-semibold text-slate-500">{card.label}</p>
-            </div>
+        {/* Magenta header strip */}
+        <div className="flex h-[48px] items-center justify-between bg-[#82134C] px-3">
+          <div>
+            <h2 className="text-[15px] font-bold text-white">
+              Spending Limits
+            </h2>
+            <p className="text-[11px] text-white/80">{card.label}</p>
           </div>
           <button
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100"
+            className="flex h-9 w-9 items-center justify-center text-white active:opacity-70"
             aria-label="Close"
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" strokeWidth={1.8} />
           </button>
         </div>
 
-        {/* Today's spend */}
-        <div className="mb-4 rounded-2xl border border-slate-100 bg-slate-50 p-4">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="flex items-center gap-1.5 text-xs font-bold text-slate-600">
-              <TrendingUp className="h-3.5 w-3.5" />
-              Spent Today
-            </span>
-            <span className="text-sm font-black text-slate-900">
-              {formatEUR(spentToday)}
-            </span>
+        <div className="flex flex-col gap-4 p-4">
+          {/* Today's spend */}
+          <div>
+            <div className="flex items-baseline justify-between">
+              <span className="text-[12px] text-[#7F7F7F]">Spent Today</span>
+              <span className="text-[13px] font-bold text-[#222222]">
+                {formatEUR(spentToday)}
+              </span>
+            </div>
+            <div className="mt-1.5 h-[6px] w-full bg-[#E5E5E5]">
+              <div
+                className={cn(
+                  "h-full transition-all",
+                  dailyPct > 80 ? "bg-[#82134C]" : "bg-[#1565C0]"
+                )}
+                style={{ width: `${dailyPct}%` }}
+              />
+            </div>
+            <p className="mt-1 text-[11px] text-[#7F7F7F]">
+              {dailyPct}% of {formatEUR(daily)} daily limit
+            </p>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
-            <div
-              className={cn(
-                "h-full rounded-full transition-all",
-                dailyPct > 80 ? "bg-rose-500" : "bg-slate-900"
-              )}
-              style={{ width: `${dailyPct}%` }}
-            />
+
+          {/* Monthly spend */}
+          <div>
+            <div className="flex items-baseline justify-between">
+              <span className="text-[12px] text-[#7F7F7F]">
+                Spent This Month
+              </span>
+              <span className="text-[13px] font-bold text-[#222222]">
+                {formatEUR(spentMonth)}
+              </span>
+            </div>
+            <div className="mt-1.5 h-[6px] w-full bg-[#E5E5E5]">
+              <div
+                className={cn(
+                  "h-full transition-all",
+                  monthlyPct > 80 ? "bg-[#82134C]" : "bg-[#1565C0]"
+                )}
+                style={{ width: `${monthlyPct}%` }}
+              />
+            </div>
+            <p className="mt-1 text-[11px] text-[#7F7F7F]">
+              {monthlyPct}% of {formatEUR(monthly)} monthly limit
+            </p>
           </div>
-          <p className="mt-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-            {dailyPct}% of {formatEUR(daily)} daily limit
-          </p>
+
+          {/* Adjust limits */}
+          <div className="flex flex-col gap-4 border-t border-[#E5E5E5] pt-4">
+            <div>
+              <label
+                htmlFor="daily-limit"
+                className="mb-1 block text-[12px] text-[#7F7F7F]"
+              >
+                Daily Limit (EUR)
+              </label>
+              <input
+                id="daily-limit"
+                type="number"
+                value={daily}
+                min={1000}
+                step={5000}
+                onChange={(e) => setDaily(Number(e.target.value) || 0)}
+                className="w-full border-b border-[#E8306E] bg-white pb-2 pt-1 text-right font-mono text-[14px] font-bold text-[#222222] outline-none focus:border-[#82134C]"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="monthly-limit"
+                className="mb-1 block text-[12px] text-[#7F7F7F]"
+              >
+                Monthly Limit (EUR)
+              </label>
+              <input
+                id="monthly-limit"
+                type="number"
+                value={monthly}
+                min={5000}
+                step={50000}
+                onChange={(e) => setMonthly(Number(e.target.value) || 0)}
+                className="w-full border-b border-[#E8306E] bg-white pb-2 pt-1 text-right font-mono text-[14px] font-bold text-[#222222] outline-none focus:border-[#82134C]"
+              />
+            </div>
+          </div>
+
+          {dailyPct > 80 && (
+            <div className="flex items-center gap-2 border border-[#82134C]/40 px-3 py-2 text-[11.5px] text-[#82134C]">
+              <AlertTriangle className="h-4 w-4 shrink-0" strokeWidth={1.8} />
+              Approaching daily limit threshold.
+            </div>
+          )}
+
+          <CbiButton onClick={save}>Save Limits</CbiButton>
         </div>
-
-        {/* Monthly spend */}
-        <div className="mb-5 rounded-2xl border border-slate-100 bg-slate-50 p-4">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="flex items-center gap-1.5 text-xs font-bold text-slate-600">
-              <TrendingUp className="h-3.5 w-3.5" />
-              Spent This Month
-            </span>
-            <span className="text-sm font-black text-slate-900">
-              {formatEUR(spentMonth)}
-            </span>
-          </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
-            <div
-              className={cn(
-                "h-full rounded-full transition-all",
-                monthlyPct > 80 ? "bg-rose-500" : "bg-slate-900"
-              )}
-              style={{ width: `${monthlyPct}%` }}
-            />
-          </div>
-          <p className="mt-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-            {monthlyPct}% of {formatEUR(monthly)} monthly limit
-          </p>
-        </div>
-
-        {/* Adjust limits */}
-        <div className="mb-4">
-          <label className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-slate-500">
-            Daily Limit (EUR)
-          </label>
-          <div className="flex items-center gap-2">
-            <input
-              type="number"
-              value={daily}
-              min={1000}
-              step={5000}
-              onChange={(e) => setDaily(Number(e.target.value) || 0)}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 font-mono text-sm font-bold text-slate-900 outline-none focus:border-slate-900 focus:bg-white"
-            />
-          </div>
-        </div>
-        <div className="mb-6">
-          <label className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-slate-500">
-            Monthly Limit (EUR)
-          </label>
-          <input
-            type="number"
-            value={monthly}
-            min={5000}
-            step={50000}
-            onChange={(e) => setMonthly(Number(e.target.value) || 0)}
-            className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 font-mono text-sm font-bold text-slate-900 outline-none focus:border-slate-900 focus:bg-white"
-          />
-        </div>
-
-        {dailyPct > 80 && (
-          <div className="mb-4 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-700">
-            <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-            Approaching daily limit threshold.
-          </div>
-        )}
-
-        <button
-          onClick={save}
-          className="active-scale w-full rounded-xl bg-slate-900 py-3.5 text-sm font-black text-white shadow-md transition-colors hover:bg-slate-800"
-        >
-          Save Limits
-        </button>
-
-        <style jsx>{`
-          .aspidus-sheet {
-            animation: aspidus-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-          }
-          @keyframes aspidus-up {
-            from {
-              transform: translateY(100%);
-            }
-            to {
-              transform: translateY(0);
-            }
-          }
-        `}</style>
       </div>
     </div>
   );

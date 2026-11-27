@@ -1,7 +1,18 @@
 "use client";
 
-import { Phone, MessageSquare, Mail, Headphones } from "lucide-react";
+import type { ReactNode } from "react";
+import {
+  Phone,
+  MessageSquare,
+  Mail,
+  MapPin,
+  Flag,
+  ChevronRight,
+  Headphones,
+  User,
+} from "lucide-react";
 import { SubPage } from "../SubPage";
+import { HexagonIcon } from "../cbi";
 import { BANK } from "@/lib/mbanking/store";
 import { toast } from "@/lib/mbanking/toast";
 
@@ -14,47 +25,84 @@ const ADVISOR = {
 export function SupportPage() {
   return (
     <SubPage title="Relationship Manager">
-      <div className="flex flex-col items-center p-5 pt-10">
-        <div className="mb-5 flex h-28 w-28 items-center justify-center rounded-full border-4 border-white bg-gradient-to-br from-emerald-100 to-slate-200 text-3xl font-black text-emerald-700 shadow-xl">
-          {ADVISOR.initials}
+      <div className="cbi-cream min-h-full px-3 py-3">
+        {/* Advisor card — flat hexagon, no circular avatar */}
+        <div className="cbi-card px-3 py-3.5">
+          <div className="flex items-center gap-3">
+            <HexagonIcon width={64}>
+              <User className="h-7 w-7" strokeWidth={1.6} />
+            </HexagonIcon>
+            <div className="min-w-0">
+              <p className="text-[15px] font-bold text-[#222222]">{ADVISOR.name}</p>
+              <p className="mt-0.5 text-[11px] text-[#7F7F7F]">{ADVISOR.role}</p>
+            </div>
+          </div>
         </div>
-        <h2 className="text-2xl font-black text-slate-900">{ADVISOR.name}</h2>
-        <p className="mb-8 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold uppercase tracking-widest text-emerald-700">
-          {ADVISOR.role}
-        </p>
 
-        <button
-          onClick={() => toast("Connecting to secure banking line…", "info")}
-          className="active-scale mb-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 py-4 text-sm font-black text-white shadow-md hover:bg-slate-800"
-        >
-          <Phone className="h-4 w-4 stroke-[2.5]" />
-          Call Direct
-        </button>
-        <button
-          onClick={() => toast("Opening secure chat…", "info")}
-          className="active-scale mb-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white py-4 text-sm font-black text-slate-900 shadow-sm hover:bg-slate-50"
-        >
-          <MessageSquare className="h-4 w-4 stroke-[2.5]" />
-          Secure Message
-        </button>
-        <button
-          onClick={() => toast("Composing secure email…", "info")}
-          className="active-scale flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white py-4 text-sm font-black text-slate-900 shadow-sm hover:bg-slate-50"
-        >
-          <Mail className="h-4 w-4 stroke-[2.5]" />
-          Email Manager
-        </button>
+        {/* Contact actions — flat white rows, hairline separators */}
+        <div className="mt-3 cbi-card">
+          <ActionRow
+            icon={<Phone className="h-4 w-4" strokeWidth={1.8} />}
+            label="Call Direct"
+            onClick={() => toast("Connecting to secure banking line…", "info")}
+          />
+          <ActionRow
+            icon={<MessageSquare className="h-4 w-4" strokeWidth={1.8} />}
+            label="Secure Message"
+            onClick={() => toast("Opening secure chat…", "info")}
+          />
+          <ActionRow
+            icon={<Mail className="h-4 w-4" strokeWidth={1.8} />}
+            label="Email Manager"
+            onClick={() => toast("Composing secure email…", "info")}
+          />
+          <ActionRow
+            icon={<MapPin className="h-4 w-4" strokeWidth={1.8} />}
+            label="Find Branch / ATM"
+            onClick={() => toast("Locating nearby CBI branches…", "info")}
+          />
+          <ActionRow
+            icon={<Flag className="h-4 w-4" strokeWidth={1.8} />}
+            label="Report an Issue"
+            onClick={() => toast("Opening issue report form…", "info")}
+          />
+        </div>
 
-        <div className="mt-8 flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-3">
-          <Headphones className="h-4 w-4 text-emerald-600" />
-          <p className="text-xs font-bold text-emerald-700">
+        {/* Priority support note */}
+        <div className="mt-3 cbi-card flex items-center gap-2 px-3 py-2.5">
+          <Headphones className="h-4 w-4 shrink-0 text-[#7A1F3D]" strokeWidth={1.8} />
+          <p className="text-[11px] text-[#595959]">
             24/7 priority support · Avg response &lt; 2 min
           </p>
         </div>
-        <p className="mt-6 text-center text-[10px] font-bold uppercase tracking-widest text-slate-300">
+
+        <p className="mt-3 text-center text-[10px] uppercase text-[#9E9E9E]">
           {BANK.legalName}
         </p>
       </div>
     </SubPage>
+  );
+}
+
+function ActionRow({
+  icon,
+  label,
+  onClick,
+}: {
+  icon: ReactNode;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex w-full items-center justify-between border-b border-[#E5E5E5] px-3 py-3 text-left last:border-b-0 active:opacity-70"
+    >
+      <span className="flex items-center gap-2.5 text-[13px] font-bold text-[#333333]">
+        <span className="text-[#7A1F3D]">{icon}</span>
+        {label}
+      </span>
+      <ChevronRight className="h-4 w-4 text-[#8C8C8C]" />
+    </button>
   );
 }

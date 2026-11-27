@@ -1,7 +1,7 @@
 "use client";
 
-import { Building, Hash, MapPin, Globe, ShieldCheck, User, Mail, Phone } from "lucide-react";
 import { SubPage } from "../SubPage";
+import { CbiRow, CbiLogo } from "../cbi";
 import { useMbanking, BANK } from "@/lib/mbanking/store";
 
 export function CompanyDetailsPage() {
@@ -9,112 +9,50 @@ export function CompanyDetailsPage() {
 
   return (
     <SubPage title="Entity Details">
-      <div className="p-5 pt-6">
-        <div className="mb-5 flex flex-col items-center rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-sm">
-          <img
-            src="/icons/icon-192.png"
-            alt={BANK.name}
-            className="mb-3 h-16 w-16 rounded-2xl shadow-sm ring-1 ring-slate-200"
-          />
-          <h2 className="text-lg font-black text-slate-900">{BANK.legalName}</h2>
-          <p className="mt-1 text-xs font-bold uppercase tracking-widest text-emerald-800">
+      <div className="px-3 py-3">
+        {/* Bank identity card */}
+        <div className="cbi-card flex flex-col items-center px-3 py-4">
+          <CbiLogo height={26} />
+          <p className="mt-2 text-[13px] font-bold text-[#595959]">{BANK.legalName}</p>
+          <p className="mt-1 text-[11px] font-bold uppercase text-[#82134C]">
             UAE-Licensed Corporate Bank
           </p>
         </div>
 
-        <div className="mb-5 flex flex-col gap-5 rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-sm">
-          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-            Account Holder
-          </p>
-          <Field
-            icon={<Building className="h-4 w-4" />}
-            label="Company Name"
-            value={profile?.company_name ?? "Aspidus DMCC"}
-          />
-          <Field
-            icon={<User className="h-4 w-4" />}
-            label="Authorized Signatory"
-            value={profile?.full_name ?? "Vladimir Maljm"}
-          />
-          <Field
-            icon={<Hash className="h-4 w-4" />}
-            label="Trade License / Reg No."
-            value={profile?.license_no ?? "DMCC-194827"}
-            mono
-          />
-          <Field
-            icon={<MapPin className="h-4 w-4" />}
-            label="Registered Office"
-            value={profile?.registered_office ?? "Almas Tower, JLT, Dubai, UAE"}
-          />
+        {/* Account holder */}
+        <div className="mt-3 cbi-card px-3 py-2.5">
+          <p className="text-[15px] font-bold text-[#595959]">Account Holder</p>
+          <div className="mt-1 border-t border-[#E5E5E5] pt-1.5">
+            <CbiRow label="Company Name" value={profile?.company_name ?? "Aspidus DMCC"} />
+            <CbiRow label="Authorized Signatory" value={profile?.full_name ?? "Vladimir Maljm"} />
+            <CbiRow label="Trade License / Reg No." value={profile?.license_no ?? "DMCC-194827"} />
+            <CbiRow
+              label="Registered Office"
+              value={profile?.registered_office ?? "Almas Tower, JLT, Dubai, UAE"}
+            />
+          </div>
         </div>
 
-        <div className="flex flex-col gap-5 rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-sm">
-          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-            Banking Partner
-          </p>
-          <Field
-            icon={<ShieldCheck className="h-4 w-4" />}
-            label="Bank"
-            value={BANK.legalName}
-          />
-          <Field
-            icon={<Hash className="h-4 w-4" />}
-            label="Bank License"
-            value={BANK.license}
-            mono
-          />
-          <Field
-            icon={<Globe className="h-4 w-4" />}
-            label="Regulator"
-            value={BANK.regulatedBy}
-          />
+        {/* Banking partner */}
+        <div className="mt-3 cbi-card px-3 py-2.5">
+          <p className="text-[15px] font-bold text-[#595959]">Banking Partner</p>
+          <div className="mt-1 border-t border-[#E5E5E5] pt-1.5">
+            <CbiRow label="Bank" value={BANK.legalName} />
+            <CbiRow label="Bank License" value={BANK.license} />
+            <CbiRow label="Regulator" value={BANK.regulatedBy} />
+          </div>
         </div>
 
         {(profile?.email || profile?.phone) && (
-          <div className="mt-5 flex flex-col gap-5 rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-sm">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-              Contact
-            </p>
-            {profile?.email && (
-              <Field icon={<Mail className="h-4 w-4" />} label="Email" value={profile.email} />
-            )}
-            {profile?.phone && (
-              <Field icon={<Phone className="h-4 w-4" />} label="Phone" value={profile.phone} />
-            )}
+          <div className="mt-3 cbi-card px-3 py-2.5">
+            <p className="text-[15px] font-bold text-[#595959]">Contact</p>
+            <div className="mt-1 border-t border-[#E5E5E5] pt-1.5">
+              {profile?.email && <CbiRow label="Email" value={profile.email} />}
+              {profile?.phone && <CbiRow label="Phone" value={profile.phone} />}
+            </div>
           </div>
         )}
       </div>
     </SubPage>
-  );
-}
-
-function Field({
-  icon,
-  label,
-  value,
-  mono,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  mono?: boolean;
-}) {
-  return (
-    <div>
-      <p className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-        <span className="text-slate-400">{icon}</span>
-        {label}
-      </p>
-      <p
-        className={
-          mono
-            ? "font-mono text-base font-black text-slate-900"
-            : "whitespace-pre-line text-sm font-bold leading-relaxed text-slate-900"
-        }
-      >
-        {value}
-      </p>
-    </div>
   );
 }
