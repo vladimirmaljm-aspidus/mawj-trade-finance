@@ -121,6 +121,25 @@
     background: linear-gradient(to bottom, #0D2B6B 0%, #0D2B6B 100%);
   }
 
+  /* Green gradient approve variant (corporate workbench actions) */
+  .cbi-btn-approve {
+    background: linear-gradient(to bottom, #2E7D4F 0%, #1D5A38 100%);
+  }
+  .cbi-btn-approve:active {
+    background: linear-gradient(to bottom, #1D5A38 0%, #1D5A38 100%);
+  }
+
+  /* Outlined secondary button (reject / cancel / keep) */
+  .cbi-btn-outline {
+    background: #ffffff;
+    color: #595959;
+    border: 1px solid #d9d9d9;
+    box-shadow: none;
+  }
+  .cbi-btn-outline:active {
+    background: #f3e5dc;
+  }
+
   /* Flat white card — hairline border, 4px radius, soft shadow */
   .cbi-card {
     background: #ffffff;

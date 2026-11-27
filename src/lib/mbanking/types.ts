@@ -98,4 +98,26 @@ export type SubPageId =
   | "trade-finance"
   | "trade-instrument"
   | "financing"
-  | "deposits";
+  | "deposits"
+  | "approvals"
+  | "scheduled"
+  | "cheques"
+  | "beneficiaries"
+  | "statements";
+
+/** Notification produced by GET /api/notifications (computed live). */
+export interface NotificationItem {
+  id: string;
+  title: string;
+  body: string;
+  tone: "info" | "success" | "warning";
+  ts: string;
+  action?:
+    | "compliance"
+    | "approvals"
+    | "scheduled"
+    | "cheques"
+    | "trade-finance"
+    | "deposits"
+    | "taxes";
+}

@@ -1,198 +1,166 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, AlertTriangle, Info, X } from "lucide-react";
-import { BANK } from "@/lib/mbanking/store";
+import { CheckCircle2, AlertTriangle, Info, X, CheckCheck } from "lucide-react";
+import { useMbanking, BANK } from "@/lib/mbanking/store";
+import { useNav } from "./nav";
 import { cn } from "@/lib/utils";
+import type { SubPageId } from "@/lib/mbanking/types";
 
-interface NotificationItem {
-  id: string;
-  title: string;
-  body: string;
-  time: string;
-  tone: "info" | "success" | "warning";
-  read: boolean;
-}
+/**
+ * Notifications panel — live inbox computed from the actual data state
+ * (compliance case, approval queue, cheques, trade instruments, deposits).
+ * Read-state is persisted locally.
+ */
+export function NotificationsPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const notifications = useMbanking((s) => s.notifications);
+  const readIds = useMbanking((s) => s.readNotificationIds);
+  const markAllRead = useMbanking((s) => s.markAllNotificationsRead);
+  const markRead = useMbanking((s) => s.markNotificationRead);
+  const nav = useNav();
+  const [dismissed, setDismissed] = useState<string[]>([]);
 
-// In a real app these would come from /api/notifications. For the demo we use
-// a realistic in-app set tied to the seeded trade-finance data.
-const NOTIFICATIONS: NotificationItem[] = [
-  {
-    id: "n0",
-    title: "Compliance Escalation",
-    body: "Final deadline for CBI-CMP-2026-0047 passed on 02 Oct — €18,500,000 remains blocked pending Source of Funds documents.",
-    time: "Today",
-    tone: "warning",
-    read: false,
-  },
-  {
-    id: "n1",
-    title: "LC Confirmation Received",
-    body: "HSBC Middle East confirmed LC HSBC-2026-6620 presentation (matures 15 Dec 2026).",
-    time: "2h ago",
-    tone: "success",
-    read: false,
-  },
-  {
-    id: "n2",
-    title: "Trade Settlement Rejected",
-    body: "Glencore International · €980,000 returned to sender under compliance hold (REF-MWJ-884031).",
-    time: "4h ago",
-    tone: "warning",
-    read: false,
-  },
-  {
-    id: "n6",
-    title: "LC Presentation Pending",
-    body: "Documents under LC-IMP-88421 (Trafigura · EUR 1,764,000 final tranche) are held — settlement awaits compliance release.",
-    time: "6h ago",
-    tone: "warning",
-    read: false,
-  },
-  {
-    id: "n7",
-    title: "Advance Payment Guarantee Expiring",
-    body: "LG-ADV-0031 (Aldar Properties · AED 1,800,000 outstanding) expires on 19 Dec 2026 unless a claim is lodged.",
-    time: "Yesterday",
-    tone: "info",
-    read: false,
-  },
-  {
-    id: "n8",
-    title: "Export LC Payment Incoming",
-    body: "LC-EXP-22014 (Aurubis AG · EUR 3,150,000) presentation verified — sight payment expected 02 Dec 2026.",
-    time: "Yesterday",
-    tone: "success",
-    read: false,
-  },
-  {
-    id: "n3",
-    title: "FX Rate Alert",
-    body: "EUR/AED moved +0.12% — favourable window for AED conversions.",
-    time: "Yesterday",
-    tone: "info",
-    read: false,
-  },
-  {
-    id: "n4",
-    title: "Statement Ready",
-    body: "October 2026 corporate statement is available for download.",
-    time: "2d ago",
-    tone: "info",
-    read: true,
-  },
-  {
-    id: "n5",
-    title: "Corporate Tax Reminder",
-    body: "UAE Corporate Tax FY2026 declaration is due in 14 days.",
-    time: "1w ago",
-    tone: "warning",
-    read: true,
-  },
-];
+  const visible = notifications.filter((n) => !dismissed.includes(n.id));
+  const unread = visible.filter((n) => !readIds.includes(n.id)).length;
 
-const TONE_STYLES = {
-  info: { icon: Info, iconColor: "text-[#1565C0]" },
-  success: { icon: CheckCircle2, iconColor: "text-[#217A3B]" },
-  warning: { icon: AlertTriangle, iconColor: "text-[#82134C]" },
-} as const;
-
-/** Right-slide notifications panel — CBI flat style. Controlled via props. */
-export function NotificationsPanel({
-  open,
-  onClose,
-}: {
-  open: boolean;
-  onClose: () => void;
-}) {
-  const [items, setItems] = useState(NOTIFICATIONS);
+  const ACTION_TARGET: Record<string, SubPageId> = {
+    compliance: "compliance",
+    approvals: "approvals",
+    scheduled: "scheduled",
+    cheques: "cheques",
+    "trade-finance": "trade-finance",
+    deposits: "deposits",
+    taxes: "taxes",
+  };
 
   if (!open) return null;
 
-  const unread = items.filter((n) => !n.read).length;
-
-  const markAllRead = () =>
-    setItems((items) => items.map((n) => ({ ...n, read: true })));
-
   return (
     <div
-      className="fixed inset-0 z-[95] flex justify-end bg-black/40"
-      onClick={onClose}
+      className="cbi-slide-in fixed inset-0 z-[110] flex flex-col bg-[#F7F7F7]"
       role="dialog"
       aria-modal="true"
       aria-label="Notifications"
     >
-      <div
-        className="cbi-slide-in flex h-full w-full max-w-md flex-col bg-[#F7F7F7] shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header bar — navy with title + close */}
-        <div className="flex h-[56px] shrink-0 items-center justify-between bg-[#000F32] px-3">
-          <h1 className="text-[16px] font-bold text-white">Notifications</h1>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={markAllRead}
-              className="border border-white/40 px-2.5 py-1 text-[10px] uppercase tracking-wider text-white active:opacity-70"
-            >
-              Mark all read
-            </button>
+      {/* Header */}
+      <header className="cbi-header-gradient relative flex h-[64px] shrink-0 items-stretch">
+        <div className="relative flex w-[58%] items-center">
+          <div className="cbi-pennant relative flex h-full items-center gap-3 bg-white pl-4">
             <button
               onClick={onClose}
-              className="flex h-8 w-8 items-center justify-center text-white active:opacity-70"
-              aria-label="Close"
+              className="flex h-9 w-9 items-center justify-center"
+              aria-label="Back"
             >
-              <X className="h-5 w-5" />
+              <X className="h-5 w-5 text-[#000F32]" />
             </button>
+            <span className="text-[15px] font-bold text-[#000F32]">Notifications</span>
           </div>
         </div>
-        <p className="bg-[#F7F7F7] px-3 pb-1 pt-2 text-[11px] text-[#7F7F7F]">
-          {unread} unread · {items.length} total
-        </p>
+        <div className="ml-auto flex items-center gap-2 pr-4">
+          <span className="text-[13px] text-white">{unread} unread</span>
+        </div>
+      </header>
 
-        {/* List — flat white cards, hairline borders */}
-        <div className="hide-scrollbar flex-1 overflow-y-auto px-3 pb-3">
-          {items.length === 0 ? (
-            <p className="py-12 text-center text-[13px] text-[#8C8C8C]">
-              No notifications
+      {/* Mark-all-read bar */}
+      <div className="flex h-[40px] shrink-0 items-center justify-between bg-[#000F32] px-3">
+        <span className="text-[11.5px] text-white/80">
+          {visible.length} alerts · live from your accounts
+        </span>
+        {unread > 0 && (
+          <button
+            onClick={() => markAllRead()}
+            className="flex items-center gap-1 text-[12px] text-white active:opacity-70"
+          >
+            <CheckCheck className="h-4 w-4" strokeWidth={1.9} />
+            Mark all read
+          </button>
+        )}
+      </div>
+
+      {/* Inbox */}
+      <div className="hide-scrollbar flex-1 overflow-y-auto px-3 py-3 pb-32">
+        {visible.length === 0 ? (
+          <div className="cbi-card px-4 py-8 text-center">
+            <CheckCircle2 className="mx-auto h-8 w-8 text-[#217A3B]" strokeWidth={1.6} />
+            <p className="mt-2 text-[13px] font-bold text-[#595959]">You&apos;re all caught up</p>
+            <p className="mt-1 text-[11.5px] text-[#7F7F7F]">
+              Alerts from your accounts and corporate services appear here.
             </p>
-          ) : (
-            items.map((n) => {
-              const tone = TONE_STYLES[n.tone];
-              const Icon = tone.icon;
-              return (
-                <button
-                  key={n.id}
-                  onClick={() =>
-                    setItems((items) =>
-                      items.map((x) => (x.id === n.id ? { ...x, read: true } : x))
-                    )
-                  }
-                  className={cn(
-                    "cbi-card mb-2 flex w-full items-start gap-3 px-3 py-3 text-left",
-                    !n.read && "border-l-[3px] border-l-[#82134C]"
-                  )}
-                >
-                  <Icon className={cn("mt-0.5 h-4 w-4 shrink-0", tone.iconColor)} />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="text-[13px] font-bold text-[#595959]">{n.title}</p>
-                      {!n.read && <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#82134C]" />}
-                    </div>
-                    <p className="mt-0.5 text-[11.5px] leading-relaxed text-[#7F7F7F]">
+          </div>
+        ) : (
+          visible.map((n) => {
+            const isRead = readIds.includes(n.id);
+            const Icon =
+              n.tone === "warning" ? AlertTriangle : n.tone === "success" ? CheckCircle2 : Info;
+            const actionPage = n.action ? ACTION_TARGET[n.action] : undefined;
+            return (
+              <div
+                key={n.id}
+                className={cn(
+                  "cbi-card mb-2 px-3 py-3",
+                  !isRead && "border-l-[3px] border-l-[#82134C]"
+                )}
+              >
+                <div className="flex items-start gap-3">
+                  <Icon
+                    className={cn(
+                      "mt-0.5 h-5 w-5 shrink-0",
+                      n.tone === "warning"
+                        ? "text-[#82134C]"
+                        : n.tone === "success"
+                          ? "text-[#217A3B]"
+                          : "text-[#1565C0]"
+                    )}
+                    strokeWidth={1.8}
+                  />
+                  <button
+                    className="min-w-0 flex-1 text-left"
+                    onClick={() => {
+                      markRead(n.id);
+                      if (actionPage) {
+                        onClose();
+                        nav.openSubPage(actionPage);
+                      }
+                    }}
+                  >
+                    <p className="flex items-center gap-2 text-[13px] font-bold text-[#333333]">
+                      <span className="truncate">{n.title}</span>
+                      {!isRead && (
+                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#82134C]" />
+                      )}
+                    </p>
+                    <p className="mt-1 text-[11.5px] leading-relaxed text-[#7F7F7F]">
                       {n.body}
                     </p>
-                    <p className="mt-1 text-[10px] text-[#9E9E9E]">{n.time}</p>
-                  </div>
-                </button>
-              );
-            })
-          )}
-        </div>
+                    <p className="mt-1 text-[10.5px] text-[#8C8C8C]">
+                      {new Date(n.ts).toLocaleString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                      {actionPage ? " · tap to view" : ""}
+                    </p>
+                  </button>
+                  <button
+                    onClick={() => {
+                      markRead(n.id);
+                      setDismissed((d) => [...d, n.id]);
+                    }}
+                    className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center text-[#8C8C8C] active:opacity-60"
+                    aria-label="Dismiss"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        )}
 
-        {/* Footer */}
-        <div className="cbi-footer-gradient flex h-[36px] shrink-0 items-center px-4">
-          <p className="text-[10px] text-white">{BANK.legalName}</p>
-        </div>
+        <p className="mt-2 text-center text-[10px] text-[#8C8C8C]">
+          {BANK.shortName} · corporate alerts · server-synced
+        </p>
       </div>
     </div>
   );

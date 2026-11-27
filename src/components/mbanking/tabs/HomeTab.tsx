@@ -14,6 +14,10 @@ import {
   Banknote,
   Vault,
   FileText,
+  BadgeCheck,
+  CalendarClock,
+  BookOpen,
+  Users,
 } from "lucide-react";
 import { useMbanking } from "@/lib/mbanking/store";
 import { useNav } from "../nav";
@@ -48,10 +52,15 @@ export function HomeTab() {
   const transactions = useMbanking((s) => s.transactions);
   const complianceCase = useMbanking((s) => s.complianceCase);
   const fxRates = useMbanking((s) => s.fxRates);
+  const workItems = useMbanking((s) => s.workItems);
   const { openSubPage, setTab } = useNav();
   const [open, setOpen] = useState(true);
 
   const recent = transactions.slice(0, 5);
+
+  const pendingApprovals = workItems.filter(
+    (w) => w.status === "Pending Approval"
+  ).length;
 
   // Funds blocked by compliance on the account matching the case currency.
   const blockedFor = (currency: string): number =>
@@ -69,6 +78,27 @@ export function HomeTab() {
     <div className="flex flex-col gap-3 pb-4">
       {/* Compliance notice — CBI flat card with magenta ribbon */}
       {complianceCase && <ComplianceBanner caseRow={complianceCase} />}
+
+      {/* Approvals strip — maker-checker queue shortcut */}
+      {pendingApprovals > 0 && (
+        <div className="px-3">
+          <button
+            onClick={() => openSubPage("approvals")}
+            className="cbi-card flex w-full items-center justify-between px-3 py-2.5 text-left active:opacity-70"
+          >
+            <span className="flex items-center gap-2.5">
+              <BadgeCheck className="h-5 w-5 text-[#82134C]" strokeWidth={1.8} />
+              <span className="text-[12.5px] font-bold text-[#333333]">
+                {pendingApprovals} item{pendingApprovals > 1 ? "s" : ""} await your approval
+              </span>
+            </span>
+            <span className="flex items-center gap-1 text-[11px] font-bold uppercase text-[#82134C]">
+              Review
+              <ChevronRight className="h-3.5 w-3.5" />
+            </span>
+          </button>
+        </div>
+      )}
 
       {/* Account Summary accordion — like the real CBI dashboard */}
       <div className="px-3 pt-3">
@@ -173,6 +203,26 @@ export function HomeTab() {
             label="Statements & Tax"
             icon={<FileText className="h-8 w-8" strokeWidth={1.6} />}
             onClick={() => openSubPage("taxes")}
+          />
+          <CbiTile
+            label="Approvals"
+            icon={<BadgeCheck className="h-8 w-8" strokeWidth={1.6} />}
+            onClick={() => openSubPage("approvals")}
+          />
+          <CbiTile
+            label="Scheduled"
+            icon={<CalendarClock className="h-8 w-8" strokeWidth={1.6} />}
+            onClick={() => openSubPage("scheduled")}
+          />
+          <CbiTile
+            label="Cheques"
+            icon={<BookOpen className="h-8 w-8" strokeWidth={1.6} />}
+            onClick={() => openSubPage("cheques")}
+          />
+          <CbiTile
+            label="Beneficiaries"
+            icon={<Users className="h-8 w-8" strokeWidth={1.6} />}
+            onClick={() => openSubPage("beneficiaries")}
           />
           <CbiTile
             label="Manage My Account"

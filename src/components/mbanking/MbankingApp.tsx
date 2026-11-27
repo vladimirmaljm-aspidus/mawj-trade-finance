@@ -27,6 +27,11 @@ import { TradeFinancePage } from "./subpages/TradeFinancePage";
 import { TradeInstrumentPage } from "./subpages/TradeInstrumentPage";
 import { FinancingPage } from "./subpages/FinancingPage";
 import { DepositsPage } from "./subpages/DepositsPage";
+import { ApprovalsPage } from "./subpages/ApprovalsPage";
+import { ScheduledPage } from "./subpages/ScheduledPage";
+import { ChequesPage } from "./subpages/ChequesPage";
+import { BeneficiariesPage } from "./subpages/BeneficiariesPage";
+import { StatementsPage } from "./subpages/StatementsPage";
 import type { TabId } from "@/lib/mbanking/types";
 
 const TAB_TITLES: Record<TabId, string> = {
@@ -145,6 +150,16 @@ function ActiveSubPage() {
       return <FinancingPage />;
     case "deposits":
       return <DepositsPage />;
+    case "approvals":
+      return <ApprovalsPage />;
+    case "scheduled":
+      return <ScheduledPage />;
+    case "cheques":
+      return <ChequesPage />;
+    case "beneficiaries":
+      return <BeneficiariesPage />;
+    case "statements":
+      return <StatementsPage />;
     default:
       return null;
   }

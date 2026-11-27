@@ -1,0 +1,45 @@
+-- ============================================================
+-- Corporate Workbench — Maker-Checker, Scheduled, Cheques (applied 2026-11-27)
+-- ============================================================
+-- Uses ONLY the existing updatable PostgREST views (no DDL required).
+--
+-- Work-record rows live in the same `transactions` table but are hidden
+-- from the account statement feed via category filtering (see /api/me):
+--   WORK_CATEGORIES = Approval | Beneficiary Activation | Cheque Book |
+--                     Stop Cheque | Scheduled Transfer | Standing Order | Cheque
+-- Monetary events (executed payments, cleared cheques, stop fee) get
+-- normal statement rows with standard categories.
+--
+-- Consistency with compliance case CBI-CMP-2026-0047 (funds blocked
+-- since 2026-03-15, outgoing transfers suspended):
+--   * Pending payment approvals exist in the queue but CANNOT be
+--     executed while the case is active (server rejects with 422).
+--   * Approved payment history is dated PRE-block (Feb 2026).
+--   * Cleared cheques are PRE-block; a post-block cheque was returned
+--     unpaid (account restriction).
+--   * Beneficiary activation / cheque-book / stop-cheque requests are
+--     SERVICE operations — approvable while funds are blocked.
+
+-- ---------- pending approvals ----------
+-- APR-778201 payment  Glencore International AG · EUR 180,000 · SWIFT (maker E. Petrova, 26 Nov)
+-- APR-778202 payment  LC Margin Deposit — LC-IMP-88421 · AED 350,000 · internal (maker E. Petrova, 25 Nov)
+-- APR-778203 activation Nakheel Properties PJSC · AE47 0260 0000 2314 8850 102 (maker E. Petrova, 24 Nov)
+-- APR-778204 chequebook AED Operating · 50 leaves · Deira pickup (maker E. Petrova, 24 Nov)
+
+-- ---------- decision history ----------
+-- APR-777101 payment Emirates Global Aluminium · AED 340,000 — APPROVED by V. Maljm 18 Feb (pre-block),
+--            executed as statement row REF-MWJ-885711 (Local Transfer, Settled).
+-- APR-776998 payment Noor Bank T/F settlement · USD 95,000 — REJECTED by V. Maljm 10 Feb
+--            (FX settlement date mismatch; returned to maker).
+
+-- ---------- scheduled / standing ----------
+-- SCH-662301 Standing Order · DP World UAE Region · AED 45,000 · monthly on the 5th · next 05 Dec (suspended)
+-- SCH-662288 Scheduled one-off · Etihad Cargo LLC · USD 78,500 · 01 Dec (suspended)
+
+-- ---------- cheque book + register (AED account) ----------
+-- CHQ-BOOK-441 series 000301–000350 · 50 leaves · issued 20 Aug 2026
+-- 000316 Emirates Steel     AED  85,000  Cleared 12 Feb  (+ statement row CHQ-000316)
+-- 000317 DNATA Travel       AED  42,500  Cleared 28 Feb  (+ statement row CHQ-000317)
+-- 000319 Dulsco             AED  12,800  Issued 20 Nov   (written, not presented)
+-- 000320 Dubai Municipality AED   9,450  Returned 26 Nov (presented on restricted account)
+-- 000321 Al Nabooda Constr. AED  22,750  Stopped 15 Nov  (lost in transit; + stop fee REF-MWJ-885803)

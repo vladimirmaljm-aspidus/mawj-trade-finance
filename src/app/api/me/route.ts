@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { readSessionFromCookies } from "@/lib/mawj/session";
 import { getSupabase, PROFILE_ID } from "@/lib/mawj/supabase-server";
+import { WORK_CATEGORIES } from "@/lib/mawj/workbench";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +32,7 @@ export async function GET() {
         .from("transactions")
         .select("*")
         .eq("profile_id", PROFILE_ID)
+        .not("category", "in", `(${WORK_CATEGORIES.map((c) => `"${c}"`).join(",")})`)
         .order("occurred_at", { ascending: false }),
       supabase
         .from("login_events")

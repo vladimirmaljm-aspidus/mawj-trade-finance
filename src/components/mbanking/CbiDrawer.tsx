@@ -16,6 +16,10 @@ import {
   Ship,
   Banknote,
   Vault,
+  BadgeCheck,
+  CalendarClock,
+  BookOpen,
+  Users,
 } from "lucide-react";
 import { CbiLogo, CbiFooter } from "./cbi";
 import { useNav } from "./nav";
@@ -28,6 +32,7 @@ interface DrawerItem {
   label: string;
   icon: typeof Home;
   go?: () => void;
+  badge?: number;
 }
 
 export function CbiDrawer({
@@ -40,7 +45,15 @@ export function CbiDrawer({
   const nav = useNav();
   const profile = useMbanking((s) => s.profile);
   const logout = useMbanking((s) => s.logout);
+  const notifications = useMbanking((s) => s.notifications);
+  const readIds = useMbanking((s) => s.readNotificationIds);
+  const workItems = useMbanking((s) => s.workItems);
   const [notifOpen, setNotifOpen] = useState(false);
+
+  const unreadCount = notifications.filter((n) => !readIds.includes(n.id)).length;
+  const pendingApprovals = workItems.filter(
+    (w) => w.status === "Pending Approval"
+  ).length;
 
   const goTab = (tab: TabId) => () => {
     nav.setTab(tab);
@@ -55,6 +68,10 @@ export function CbiDrawer({
     { label: "Account Summary", icon: Home, go: goTab("home") },
     { label: "My Accounts", icon: Landmark, go: goSubPage("accounts") },
     { label: "Transfers", icon: ArrowRightLeft, go: goTab("payments") },
+    { label: "Approvals", icon: BadgeCheck, go: goSubPage("approvals"), badge: pendingApprovals },
+    { label: "Scheduled Transfers", icon: CalendarClock, go: goSubPage("scheduled") },
+    { label: "Beneficiaries", icon: Users, go: goSubPage("beneficiaries") },
+    { label: "Cheque Services", icon: BookOpen, go: goSubPage("cheques") },
     { label: "Card Services", icon: CreditCard, go: goTab("cards") },
     { label: "Trade Finance", icon: Ship, go: goSubPage("trade-finance") },
     { label: "Financing", icon: Banknote, go: goSubPage("financing") },
@@ -62,7 +79,7 @@ export function CbiDrawer({
     { label: "FX Rates", icon: BarChart3, go: goTab("fx") },
     { label: "Compliance", icon: ShieldAlert, go: goSubPage("compliance") },
     { label: "Statements & Tax", icon: FileText, go: goSubPage("taxes") },
-    { label: "Notifications", icon: Bell, go: () => { setNotifOpen(true); onClose(); } },
+    { label: "Notifications", icon: Bell, go: () => { setNotifOpen(true); onClose(); }, badge: unreadCount },
     { label: "Security", icon: Lock, go: goSubPage("security") },
     { label: "Company Details", icon: Building2, go: goSubPage("company-details") },
     {
@@ -125,7 +142,12 @@ export function CbiDrawer({
                 className="flex w-full items-center gap-3 border-b border-[#E5E5E5] px-4 py-[13px] text-left active:bg-[#F3E5DC]"
               >
                 <Icon className="h-[18px] w-[18px] text-[#7A1F3D]" strokeWidth={1.8} />
-                <span className="text-[13.5px] text-[#333333]">{item.label}</span>
+                <span className="flex-1 text-[13.5px] text-[#333333]">{item.label}</span>
+                {item.badge ? (
+                  <span className="flex h-[18px] min-w-[18px] items-center justify-center bg-[#82134C] px-1 text-[10.5px] font-bold text-white">
+                    {item.badge > 9 ? "9+" : item.badge}
+                  </span>
+                ) : null}
               </button>
             );
           })}

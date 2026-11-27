@@ -8,6 +8,7 @@ import type {
   CardInfo,
   FxRate,
   LoginEvent,
+  NotificationItem,
   Profile,
   Transaction,
   TransferMethod,
@@ -37,6 +38,12 @@ interface MbankingState {
   facilities: LoanFacility[];
   /** Term and call deposits. */
   deposits: Deposit[];
+  /** Corporate workbench records (approvals, scheduled, cheques, books). */
+  workItems: Transaction[];
+  /** Notification inbox (computed server-side from live data). */
+  notifications: NotificationItem[];
+  /** Ids of notifications already seen (persisted locally). */
+  readNotificationIds: string[];
   /** Privacy toggle — hide balance on screen. */
   hideBalance: boolean;
   /** Whether biometric re-auth is required on every launch (in-memory setting). */
@@ -46,11 +53,38 @@ interface MbankingState {
   // actions
   checkSession: () => Promise<boolean>;
   hydrate: () => Promise<void>;
+  refreshWorkbench: () => Promise<void>;
+  refreshNotifications: () => Promise<void>;
+  markNotificationRead: (id: string) => void;
+  markAllNotificationsRead: () => void;
+  decideApproval: (
+    id: string,
+    decision: "approve" | "reject"
+  ) => Promise<{ ok: boolean; note?: string; error?: string }>;
+  requestApproval: (
+    kind: "payment" | "beneficiary" | "chequebook" | "stopcheque",
+    payload: Record<string, unknown>
+  ) => Promise<{ ok: boolean; error?: string }>;
+  cancelWorkItem: (id: string) => Promise<{ ok: boolean; error?: string }>;
+  addBeneficiaryRequest: (input: {
+    name: string;
+    iban: string;
+    country?: string;
+    method?: string;
+    note?: string;
+  }) => Promise<{ ok: boolean; error?: string }>;
+  deleteBeneficiary: (id: string) => Promise<{ ok: boolean; error?: string }>;
+  downloadStatement: (
+    accountId: string,
+    from: string,
+    to: string
+  ) => Promise<void>;
   sendTransfer: (input: {
     recipient: string;
     iban: string;
     amount: number;
     method: TransferMethod;
+    fromAccountId?: string;
     memo?: string;
   }) => Promise<{ ok: true; tx: Transaction } | { ok: false; reason: string }>;
   toggleCardFreeze: (cardId: string) => Promise<void>;
@@ -76,6 +110,16 @@ async function api<T = unknown>(
   return data as T;
 }
 
+/** Read-state for notifications, persisted locally. */
+function loadReadIds(): string[] {
+  try {
+    const v = localStorage.getItem("cbi-read-notifications");
+    return v ? (JSON.parse(v) as string[]) : [];
+  } catch {
+    return [];
+  }
+}
+
 export const useMbanking = create<MbankingState>((set, get) => ({
   status: "loading",
   profile: null,
@@ -90,6 +134,9 @@ export const useMbanking = create<MbankingState>((set, get) => ({
   tradeInstruments: [],
   facilities: [],
   deposits: [],
+  workItems: [],
+  notifications: [],
+  readNotificationIds: [],
   hideBalance: false,
   requireBiometrics: true,
   lastError: null,
@@ -111,7 +158,7 @@ export const useMbanking = create<MbankingState>((set, get) => ({
 
   hydrate: async () => {
     try {
-      const [data, compl, corp] = await Promise.all([
+      const [data, compl, corp, work, notif] = await Promise.all([
         api<{
           profile: Profile;
           accounts: Account[];
@@ -128,6 +175,8 @@ export const useMbanking = create<MbankingState>((set, get) => ({
           facilities: LoanFacility[];
           deposits: Deposit[];
         }>(`/api/corporate?_=${Date.now()}`),
+        api<{ workItems: Transaction[] }>(`/api/workbench?_=${Date.now()}`),
+        api<{ notifications: NotificationItem[] }>(`/api/notifications?_=${Date.now()}`),
       ]);
       set({
         status: "authenticated",
@@ -143,11 +192,148 @@ export const useMbanking = create<MbankingState>((set, get) => ({
         tradeInstruments: corp.tradeInstruments,
         facilities: corp.facilities,
         deposits: corp.deposits,
+        workItems: work.workItems,
+        notifications: notif.notifications,
+        readNotificationIds: loadReadIds(),
         lastError: null,
       });
     } catch (e) {
       set({ status: "unauthenticated", lastError: (e as Error).message });
     }
+  },
+
+  refreshWorkbench: async () => {
+    try {
+      const [work, data] = await Promise.all([
+        api<{ workItems: Transaction[] }>(`/api/workbench?_=${Date.now()}`),
+        api<{ transactions: Transaction[]; balance: number; accounts: Account[] }>(`/api/me?_=${Date.now()}`),
+      ]);
+      set({
+        workItems: work.workItems,
+        transactions: data.transactions,
+        balance: data.balance,
+        accounts: data.accounts,
+      });
+    } catch {
+      /* keep previous state */
+    }
+  },
+
+  refreshNotifications: async () => {
+    try {
+      const notif = await api<{ notifications: NotificationItem[] }>(`/api/notifications?_=${Date.now()}`);
+      set({ notifications: notif.notifications });
+    } catch {
+      /* keep previous state */
+    }
+  },
+
+  markNotificationRead: (id) => {
+    set((s) => {
+      const ids = Array.from(new Set([...s.readNotificationIds, id]));
+      try {
+        localStorage.setItem("cbi-read-notifications", JSON.stringify(ids));
+      } catch {
+        /* ignore */
+      }
+      return { readNotificationIds: ids };
+    });
+  },
+
+  markAllNotificationsRead: () => {
+    const ids = get().notifications.map((n) => n.id);
+    try {
+      localStorage.setItem("cbi-read-notifications", JSON.stringify(ids));
+    } catch {
+      /* ignore */
+    }
+    set({ readNotificationIds: ids });
+  },
+
+  decideApproval: async (id, decision) => {
+    try {
+      const data = await api<{ ok: boolean; note?: string }>('/api/approvals', {
+        method: 'PATCH',
+        body: JSON.stringify({ id, decision }),
+      });
+      await get().refreshWorkbench();
+      await get().refreshNotifications();
+      return { ok: true, note: data.note };
+    } catch (e) {
+      return { ok: false, error: (e as Error).message };
+    }
+  },
+
+  requestApproval: async (kind, payload) => {
+    try {
+      await api('/api/approvals', {
+        method: 'POST',
+        body: JSON.stringify({ kind, payload }),
+      });
+      await get().refreshWorkbench();
+      await get().refreshNotifications();
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: (e as Error).message };
+    }
+  },
+
+  cancelWorkItem: async (id) => {
+    try {
+      await api('/api/workbench', {
+        method: 'PATCH',
+        body: JSON.stringify({ id, action: 'cancel' }),
+      });
+      await get().refreshWorkbench();
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: (e as Error).message };
+    }
+  },
+
+  addBeneficiaryRequest: async (input) => {
+    try {
+      await api('/api/beneficiaries', {
+        method: 'POST',
+        body: JSON.stringify(input),
+      });
+      await get().refreshWorkbench();
+      await get().refreshNotifications();
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: (e as Error).message };
+    }
+  },
+
+  deleteBeneficiary: async (id) => {
+    try {
+      await api(`/api/beneficiaries?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+      set((s) => ({ beneficiaries: s.beneficiaries.filter((b) => b.id !== id) }));
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: (e as Error).message };
+    }
+  },
+
+  downloadStatement: async (accountId, from, to) => {
+    const res = await fetch('/api/statements', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ accountId, from, to }),
+    });
+    if (!res.ok) {
+      throw new Error('statement_failed');
+    }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `CBI-Statement-${from}-to-${to}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
   },
 
   sendTransfer: async (input) => {
@@ -162,9 +348,6 @@ export const useMbanking = create<MbankingState>((set, get) => ({
       set((s) => ({
         balance: data.balance,
         transactions: [data.transaction, ...s.transactions],
-        accounts: s.accounts.map((a) =>
-          a.is_primary ? { ...a, balance: data.balance } : a
-        ),
       }));
       return { ok: true, tx: data.transaction };
     } catch (e) {
@@ -218,6 +401,9 @@ export const useMbanking = create<MbankingState>((set, get) => ({
       tradeInstruments: [],
       facilities: [],
       deposits: [],
+      workItems: [],
+      notifications: [],
+      readNotificationIds: [],
     });
   },
 }));
