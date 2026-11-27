@@ -6,7 +6,7 @@ import { SubPage } from "../SubPage";
 import { useMbanking } from "@/lib/mbanking/store";
 import { CbiAccordionCard, CbiRow, HexagonIcon } from "../cbi";
 import { ComplianceGate } from "../ComplianceGate";
-import { formatEUR, formatUSD, formatAED } from "@/lib/mbanking/format";
+import { formatAED, formatPlain } from "@/lib/mbanking/format";
 import { fmtDate } from "./TradeFinancePage";
 import type { LoanFacility } from "@/lib/mbanking/corporate-types";
 
@@ -18,12 +18,6 @@ function toAed(amount: number, currency: string): number {
   if (currency === "AED") return amount;
   if (currency === "USD") return amount * USD_TO_AED;
   return amount * EUR_TO_AED;
-}
-
-function fmtMoney(amount: number, currency: string): string {
-  if (currency === "USD") return formatUSD(amount);
-  if (currency === "AED") return formatAED(amount);
-  return formatEUR(amount);
 }
 
 /** Stable glyph component for the facility type (icons must not be created during render). */
@@ -47,7 +41,7 @@ function FacilityCard({ facility }: { facility: LoanFacility }) {
       open={open}
       onToggle={() => setOpen((v) => !v)}
       summaryLabel="Outstanding"
-      summaryValue={fmtMoney(facility.outstanding, facility.currency)}
+      summaryValue={formatPlain(facility.outstanding)}
     >
       <div className="pb-1">
         <div className="flex items-center gap-2 pb-1">
@@ -60,17 +54,17 @@ function FacilityCard({ facility }: { facility: LoanFacility }) {
         </div>
         <CbiRow
           label="Approved Limit"
-          value={fmtMoney(facility.limit, facility.currency)}
+          value={formatPlain(facility.limit)}
           currency={facility.currency}
         />
         <CbiRow
           label="Outstanding"
-          value={fmtMoney(facility.outstanding, facility.currency)}
+          value={formatPlain(facility.outstanding)}
           currency={facility.currency}
         />
         <CbiRow
           label="Available"
-          value={fmtMoney(available, facility.currency)}
+          value={formatPlain(available)}
           currency={facility.currency}
         />
         <CbiRow label="Rate Basis" value={facility.rateBasis} />
@@ -109,7 +103,7 @@ function FacilityCard({ facility }: { facility: LoanFacility }) {
           />
           <CbiRow
             label="Amount"
-            value={fmtMoney(facility.nextPayment.amount, facility.currency)}
+            value={formatPlain(facility.nextPayment.amount)}
             currency={facility.currency}
             bold
           />
@@ -135,7 +129,7 @@ function FacilityCard({ facility }: { facility: LoanFacility }) {
                 <p className="text-[10px] text-[#9E9E9E]">{fmtDate(m.date)}</p>
               </div>
               <p className="shrink-0 text-[11.5px] font-bold text-[#222222]">
-                {fmtMoney(m.amount, m.currency)}
+                {formatPlain(m.amount)}
               </p>
             </div>
           ))}
@@ -177,18 +171,14 @@ export function FinancingPage() {
               <CbiRow
                 label="Approved Limits (AED eq.)"
                 value={formatAED(totalLimitAed)}
-                currency="AED"
-                bold
               />
               <CbiRow
                 label="Outstanding (AED eq.)"
                 value={formatAED(totalOutstandingAed)}
-                currency="AED"
               />
               <CbiRow
                 label="Available (AED eq.)"
                 value={formatAED(totalAvailableAed)}
-                currency="AED"
               />
               <p className="mt-1 text-[10px] text-[#9E9E9E]">
                 Indicative equivalents at today&apos;s board rates.

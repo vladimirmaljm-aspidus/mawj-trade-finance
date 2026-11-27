@@ -40,13 +40,13 @@ export const TRADE_INSTRUMENTS: TradeInstrument[] = [
     incoterms: "CIF Jebel Ali",
     loadingPort: "Antwerp, Belgium",
     dischargePort: "Jebel Ali, UAE",
-    latestShipment: "2026-11-30",
+    latestShipment: "2026-11-05",
     partialShipments: "Allowed",
     transferable: false,
     marginPct: 0.2,
     charge: {
       rate: "0.85% p.a.",
-      basis: "on issued amount, debited quarterly",
+      basis: "on issued amount, debited quarterly — final debit at expiry",
       nextDebit: "2026-12-15",
       amount: 8_925,
     },
@@ -80,7 +80,7 @@ export const TRADE_INSTRUMENTS: TradeInstrument[] = [
         date: "2026-11-14",
         title: "Final presentation — payment held",
         description:
-          "Documents for the final 1,000 MT tranche received. Settlement is held pending compliance release (CBI-CMP-2026-0047).",
+          "Documents for the final 1,000 MT tranche (shipped 05 Nov) received. Settlement is held pending compliance release (CBI-CMP-2026-0047).",
       },
     ],
     complianceNote:
@@ -104,7 +104,7 @@ export const TRADE_INSTRUMENTS: TradeInstrument[] = [
     incoterms: "FOB Kobe",
     loadingPort: "Kobe, Japan",
     dischargePort: "Jebel Ali, UAE",
-    latestShipment: "2026-08-15",
+    latestShipment: "2026-01-20",
     partialShipments: "Not allowed",
     transferable: false,
     marginPct: 0.25,
@@ -547,14 +547,14 @@ export const LOAN_FACILITIES: LoanFacility[] = [
     movements: [
       {
         date: "2026-09-30",
-        description: "Discount charge — September",
-        amount: 12_840,
+        description: "Discount charge — September (on EUR 3,240,000)",
+        amount: 14_715,
         currency: "EUR",
       },
       {
         date: "2026-10-31",
-        description: "Discount charge — October",
-        amount: 12_840,
+        description: "Discount charge — October (on EUR 3,240,000)",
+        amount: 14_715,
         currency: "EUR",
       },
     ],

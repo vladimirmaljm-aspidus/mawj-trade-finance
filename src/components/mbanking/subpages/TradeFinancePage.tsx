@@ -7,15 +7,9 @@ import { useMbanking } from "@/lib/mbanking/store";
 import { useNav } from "../nav";
 import { CbiAccordionCard, CbiRow } from "../cbi";
 import { ComplianceGate } from "../ComplianceGate";
-import { formatEUR, formatUSD, formatAED } from "@/lib/mbanking/format";
+import { formatPlain } from "@/lib/mbanking/format";
 import { cn } from "@/lib/utils";
 import type { TradeInstrument } from "@/lib/mbanking/corporate-types";
-
-function fmtMoney(amount: number, currency: string): string {
-  if (currency === "USD") return formatUSD(amount);
-  if (currency === "AED") return formatAED(amount);
-  return formatEUR(amount);
-}
 
 export function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-GB", {
@@ -74,18 +68,18 @@ function InstrumentRow({ instrument }: { instrument: TradeInstrument }) {
       <div className="pt-1">
         <CbiRow
           label={`${instrument.kindLabel} Amount`}
-          value={fmtMoney(instrument.amount, instrument.currency)}
+          value={formatPlain(instrument.amount)}
           currency={instrument.currency}
         />
         <CbiRow
           label="Utilized"
-          value={fmtMoney(instrument.utilized, instrument.currency)}
+          value={formatPlain(instrument.utilized)}
           currency={instrument.currency}
         />
         {available > 0 && (
           <CbiRow
             label="Available Commitment"
-            value={fmtMoney(available, instrument.currency)}
+            value={formatPlain(available)}
             currency={instrument.currency}
           />
         )}
@@ -164,17 +158,17 @@ export function TradeFinancePage() {
             <div className="mt-1 border-t border-[#E0E0E0] pt-1.5">
               <CbiRow
                 label="Import LC Commitment"
-                value={fmtMoney(importCommitment, importLcCurrency)}
+                value={formatPlain(importCommitment)}
                 currency={importLcCurrency}
               />
               <CbiRow
                 label="Guarantees Outstanding"
-                value={formatAED(lgOutstanding)}
+                value={formatPlain(lgOutstanding)}
                 currency="AED"
               />
               <CbiRow
                 label="Collections Under Processing"
-                value={fmtMoney(collectionsValue, "EUR")}
+                value={formatPlain(collectionsValue)}
                 currency="EUR"
               />
               <CbiRow label="Trust Receipts Outstanding" value="0.00" currency="USD" />

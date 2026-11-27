@@ -5,18 +5,12 @@ import { SubPage } from "../SubPage";
 import { useMbanking } from "@/lib/mbanking/store";
 import { CbiRow, HexagonIcon } from "../cbi";
 import { ComplianceGate } from "../ComplianceGate";
-import { formatEUR, formatUSD, formatAED } from "@/lib/mbanking/format";
+import { formatAED, formatPlain } from "@/lib/mbanking/format";
 import { fmtDate } from "./TradeFinancePage";
 import type { Deposit } from "@/lib/mbanking/corporate-types";
 
 const USD_TO_AED = 3.6725;
 const EUR_TO_AED = 3.9545;
-
-function fmtMoney(amount: number, currency: string): string {
-  if (currency === "USD") return formatUSD(amount);
-  if (currency === "AED") return formatAED(amount);
-  return formatEUR(amount);
-}
 
 /** Whole days from today until an ISO date (negative if past). */
 function daysUntil(iso: string): number {
@@ -64,7 +58,7 @@ function DepositCard({ deposit }: { deposit: Deposit }) {
       <div className="mt-2 border-t border-[#E5E5E5] pt-1.5">
         <CbiRow
           label="Principal"
-          value={fmtMoney(deposit.principal, deposit.currency)}
+          value={formatPlain(deposit.principal)}
           currency={deposit.currency}
           bold
         />
@@ -79,17 +73,14 @@ function DepositCard({ deposit }: { deposit: Deposit }) {
         {deposit.interestAtMaturity !== undefined && (
           <CbiRow
             label="Interest at Maturity"
-            value={fmtMoney(deposit.interestAtMaturity, deposit.currency)}
+            value={formatPlain(deposit.interestAtMaturity)}
             currency={deposit.currency}
           />
         )}
         {deposit.lastInterestCredit && (
           <CbiRow
             label="Last Interest Credit"
-            value={fmtMoney(
-              deposit.lastInterestCredit.amount,
-              deposit.currency
-            )}
+            value={formatPlain(deposit.lastInterestCredit.amount)}
             currency={deposit.currency}
           />
         )}
@@ -154,13 +145,10 @@ export function DepositsPage() {
               <CbiRow
                 label="Total Principal (AED eq.)"
                 value={formatAED(totalPrincipalAed)}
-                currency="AED"
-                bold
               />
               <CbiRow
-                label="Interest Payable at Maturity (AED eq.)"
+                label="Interest at Maturity (AED eq.)"
                 value={formatAED(totalMaturityInterestAed)}
-                currency="AED"
               />
               <div className="flex items-start gap-1.5 pt-1">
                 <Percent className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#7A1F3D]" strokeWidth={1.8} />

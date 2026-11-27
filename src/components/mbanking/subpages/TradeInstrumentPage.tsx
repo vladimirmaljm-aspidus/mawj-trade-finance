@@ -6,15 +6,9 @@ import { useMbanking } from "@/lib/mbanking/store";
 import { useNav } from "../nav";
 import { CbiButton, CbiRow, HexagonIcon } from "../cbi";
 import { toast } from "@/lib/mbanking/toast";
-import { formatEUR, formatUSD, formatAED } from "@/lib/mbanking/format";
+import { formatPlain } from "@/lib/mbanking/format";
 import { InstrumentStatusChip, fmtDate } from "./TradeFinancePage";
 import { cn } from "@/lib/utils";
-
-function fmtMoney(amount: number, currency: string): string {
-  if (currency === "USD") return formatUSD(amount);
-  if (currency === "AED") return formatAED(amount);
-  return formatEUR(amount);
-}
 
 /** Flat utilization bar — navy fill on a hairline track. */
 function UtilizationBar({ pct }: { pct: number }) {
@@ -97,19 +91,19 @@ export function TradeInstrumentPage() {
           )}
           <CbiRow
             label="Instrument Amount"
-            value={fmtMoney(instrument.amount, instrument.currency)}
+            value={formatPlain(instrument.amount)}
             currency={instrument.currency}
             bold
           />
           <CbiRow
             label="Utilized"
-            value={fmtMoney(instrument.utilized, instrument.currency)}
+            value={formatPlain(instrument.utilized)}
             currency={instrument.currency}
           />
           {available > 0 && (
             <CbiRow
               label="Available Commitment"
-              value={fmtMoney(available, instrument.currency)}
+              value={formatPlain(available)}
               currency={instrument.currency}
             />
           )}
@@ -143,7 +137,7 @@ export function TradeInstrumentPage() {
           {marginAmount !== null && (
             <CbiRow
               label={`Cash Margin (${(instrument.marginPct ?? 0) * 100}%)`}
-              value={fmtMoney(marginAmount, instrument.currency)}
+              value={formatPlain(marginAmount)}
               currency={instrument.currency}
             />
           )}
@@ -169,7 +163,7 @@ export function TradeInstrumentPage() {
             />
             <CbiRow
               label="Next Debit Amount"
-              value={fmtMoney(instrument.charge.amount, instrument.currency)}
+              value={formatPlain(instrument.charge.amount)}
               currency={instrument.currency}
               bold
             />

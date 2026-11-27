@@ -31,8 +31,8 @@
 --   2026-11-10  Bank Guarantee Commission        AED 10,106  REF-MWJ-885514 (LG-PERF-0092)
 -- EUR Main Treasury (22222222-0001):
 --   2026-09-15  LC Commission — Import            EUR  8,925  REF-MWJ-885212 (LC-IMP-88421)
---   2026-09-30  Discounting Charge               EUR 12,840  REF-MWJ-885300 (FAC-IDF-002)
---   2026-10-31  Discounting Charge               EUR 12,840  REF-MWJ-885655 (FAC-IDF-002)
+--   2026-09-30  Discounting Charge               EUR 14,715  REF-MWJ-885300 (FAC-IDF-002)
+--   2026-10-31  Discounting Charge               EUR 14,715  REF-MWJ-885655 (FAC-IDF-002)
 -- USD Reserve Holding (22222222-0002):
 --   2026-06-30  Working Capital Facility Int.    USD 100,000 REF-MWJ-884700 (FAC-WCF-001)
 --   2026-09-30  Working Capital Facility Int.    USD 100,000 REF-MWJ-885301 (FAC-WCF-001)

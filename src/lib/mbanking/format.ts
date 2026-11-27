@@ -20,6 +20,17 @@ const aedFormatter = new Intl.NumberFormat("en-AE", {
 
 const numberFormatter = new Intl.NumberFormat("en-IE");
 
+/** Plain number with grouping + 2 decimals (no currency symbol) — pair with
+    the CbiRow `currency` prefix so codes are never duplicated. */
+const plainMoneyFormatter = new Intl.NumberFormat("en-AE", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+export function formatPlain(amount: number): string {
+  return plainMoneyFormatter.format(amount);
+}
+
 export function formatEUR(amount: number): string {
   return eurFormatter.format(amount);
 }
