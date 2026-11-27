@@ -14,7 +14,7 @@ export function ReceivePage() {
   const primary = accounts.find((a) => a.is_primary) ?? accounts[0];
   const companyName = profile?.company_name ?? "Aspidus DMCC";
   const iban = primary?.iban ?? "";
-  const bic = primary?.bic ?? "COBADEFFXXX";
+  const bic = primary?.bic ?? "CLBIAEADXXX";
 
   const copy = (label: string, value: string) => {
     if (typeof navigator !== "undefined" && navigator.clipboard) {
@@ -23,7 +23,7 @@ export function ReceivePage() {
     toast(`${label} copied securely`, "success");
   };
 
-  const sepaString = `SEPA\nIBAN:${iban}\nBIC:${bic}\nNAME:${companyName}`;
+  const sepaString = `SWIFT\nIBAN:${iban}\nBIC:${bic}\nNAME:${companyName}`;
 
   return (
     <SubPage title="Funding Details">
@@ -43,14 +43,14 @@ export function ReceivePage() {
             bgColor="#ffffff"
             fgColor="#000F32"
           />
-          <p className="mt-2 text-[10px] uppercase text-[#9E9E9E]">Scan · SEPA Credit Transfer</p>
+          <p className="mt-2 text-[10px] uppercase text-[#9E9E9E]">Scan · SWIFT International Transfer</p>
         </div>
 
         {/* Account details rows */}
         <div className="mt-2 cbi-card px-3 py-2.5">
           <p className="pb-1 text-[15px] font-bold text-[#595959]">Account Details</p>
           <div className="border-t border-[#E5E5E5] pt-1">
-            <CopyRow label="IBAN (SEPA)" value={iban} onCopy={() => copy("IBAN", iban)} />
+            <CopyRow label="IBAN (CBI UAE)" value={iban} onCopy={() => copy("IBAN", iban)} />
             <CopyRow label="BIC / SWIFT" value={bic} onCopy={() => copy("BIC", bic)} />
             <CopyRow
               label="Beneficiary"
@@ -75,7 +75,7 @@ export function ReceivePage() {
         </div>
 
         <p className="mt-3 px-2 text-center text-[11px] leading-relaxed text-[#7F7F7F]">
-          Funds typically settle same business day for SEPA, 1–3 days for SWIFT.
+          Funds typically settle same business day for local AED transfers, 1–3 business days for SWIFT.
         </p>
         <p className="mt-2 text-center text-[10px] uppercase text-[#9E9E9E]">
           Routed via {BANK.shortName} · {BANK.license}

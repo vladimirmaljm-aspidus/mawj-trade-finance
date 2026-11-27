@@ -297,7 +297,7 @@ export function PaymentsTab() {
                     value={iban}
                     onChange={(e) => setIban(e.target.value.toUpperCase())}
                     required
-                    placeholder="AE89 0330 0044 0532 01"
+                    placeholder="AE88 0220 0044 0532 01"
                     className="w-full border-b border-[#E8306E] bg-white pb-2 pt-1 font-mono text-[13px] font-bold uppercase tracking-[0.06em] text-[#222222] outline-none placeholder:font-normal placeholder:tracking-normal placeholder:text-[#BFBFBF] focus:border-[#82134C]"
                   />
                 </div>

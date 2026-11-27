@@ -324,11 +324,13 @@ export function CbiRow({
   value,
   currency,
   bold = false,
+  danger = false,
 }: {
   label: string;
   value: string;
   currency?: string;
   bold?: boolean;
+  danger?: boolean;
 }) {
   return (
     <div className="flex items-baseline justify-between py-[3px]">
@@ -336,7 +338,8 @@ export function CbiRow({
       <span
         className={cn(
           "text-[13px] text-[#222222]",
-          bold && "font-bold"
+          bold && "font-bold",
+          danger && "font-bold text-[#82134C]"
         )}
       >
         {currency && <span className="text-[#7F7F7F]">{currency} </span>}

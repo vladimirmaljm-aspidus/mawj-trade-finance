@@ -49,6 +49,12 @@ export function HomeTab() {
 
   const recent = transactions.slice(0, 5);
 
+  // Funds blocked by compliance on the account matching the case currency.
+  const blockedFor = (currency: string): number =>
+    complianceCase && complianceCase.currency === currency
+      ? complianceCase.amount_blocked
+      : 0;
+
   // Total indicative AED equivalent across all accounts.
   const totalAed = accounts.reduce(
     (sum, a) => sum + aedEquivalent(a.balance, a.currency, fxRates),
@@ -69,25 +75,37 @@ export function HomeTab() {
           summaryLabel="Indicative AED Equivalent"
           summaryValue={`AED ${fmt(totalAed, "AED")}`}
         >
-          {accounts.map((acc) => (
-            <CbiAccountRow
-              key={acc.id}
-              accountNumber={acc.iban.replace(/\s/g, "")}
-              onClick={() => openSubPage("accounts")}
-            >
-              <p className="pb-0.5 text-[11px] text-[#7F7F7F]">{acc.label}</p>
-              <CbiRow
-                label="Available Bal."
-                value={fmt(acc.balance, acc.currency)}
-                currency={acc.currency}
-              />
-              <CbiRow
-                label="Indicative AED Equivalent"
-                value={fmt(aedEquivalent(acc.balance, acc.currency, fxRates), "AED")}
-                currency="AED"
-              />
-            </CbiAccountRow>
-          ))}
+          {accounts.map((acc) => {
+            const blocked = blockedFor(acc.currency);
+            const available = Math.max(0, acc.balance - blocked);
+            return (
+              <CbiAccountRow
+                key={acc.id}
+                accountNumber={acc.iban.replace(/\s/g, "")}
+                onClick={() => openSubPage("accounts")}
+              >
+                <p className="pb-0.5 text-[11px] text-[#7F7F7F]">{acc.label}</p>
+                <CbiRow
+                  label="Available Bal."
+                  value={fmt(available, acc.currency)}
+                  currency={acc.currency}
+                />
+                {blocked > 0 && (
+                  <CbiRow
+                    label="Blocked Funds (Compliance)"
+                    value={fmt(blocked, acc.currency)}
+                    currency={acc.currency}
+                    danger
+                  />
+                )}
+                <CbiRow
+                  label="Indicative AED Equivalent"
+                  value={fmt(aedEquivalent(acc.balance, acc.currency, fxRates), "AED")}
+                  currency="AED"
+                />
+              </CbiAccountRow>
+            );
+          })}
           {accounts.length === 0 && (
             <p className="py-3 text-center text-[12px] text-[#9E9E9E]">
               No accounts available
