@@ -1,7 +1,7 @@
 // Aspidus DMCC — Service Worker
 // Caches the app shell for offline use and installability.
 
-const CACHE_VERSION = "aspidus-v1";
+const CACHE_VERSION = "aspidus-v2-cbi";
 const APP_SHELL = [
   "/",
   "/manifest.webmanifest",
